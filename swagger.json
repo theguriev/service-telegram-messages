@@ -1,0 +1,195 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Telegram Messages Service",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/message": {
+      "post": {
+        "summary": "Sends message to selected user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message sucessfully sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Message was already sent today",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/message/can-send": {
+      "get": {
+        "summary": "Check if user can send message",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CanSendResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MessageRequest": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Message content in markdownV2 format",
+            "example": "Hello, this is a test message"
+          },
+          "receiverId": {
+            "type": "number",
+            "example": 379669527
+          }
+        },
+        "required": ["content", "receiverId"]
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "example": "64e0f3b2c4d5f8a1b2c4d5f8a"
+              },
+              "userId": {
+                "type": "string",
+                "example": "379669527"
+              },
+              "content": {
+                "type": "string",
+                "description": "Message content in markdownV2 format",
+                "example": "Hello, this is a test message"
+              },
+              "receiverId": {
+                "type": "number",
+                "example": 379669527
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2023-10-01T12:00:00Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "example": "2023-10-01T12:00:00Z"
+              },
+              "__v": {
+                "type": "number",
+                "example": 0
+              }
+            }
+          }
+        }
+      },
+      "CanSendResponse": {
+        "type": "object",
+        "properties": {
+          "canSend": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "example": "/message"
+          },
+          "statusCode": {
+            "type": "number",
+            "example": 400
+          },
+          "statusMessage": {
+            "type": "string",
+            "example": "Bad Request",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Error message",
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}
