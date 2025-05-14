@@ -13,12 +13,6 @@ describe.sequential("Message", () => {
     { secret: process.env.SECRET }
   );
 
-  let mockTelegram: ReturnType<typeof useTelegram>;
-
-  beforeAll(async () => {
-    mockTelegram = useTelegram();
-  });
-
   describe("GET /message/can-send", () => {
     it("gets 200 with true before message sending", async () => {
       await $fetch("/message/can-send", {
@@ -38,7 +32,6 @@ describe.sequential("Message", () => {
 
   describe("POST /message", () => {
     it("gets 400 on validation errors", async () => {
-      mockTelegram.sendMessage.mockReturnValue(Promise.resolve());
       await $fetch("/message", {
         baseURL,
         method: "POST",
@@ -55,7 +48,6 @@ describe.sequential("Message", () => {
     });
 
     it("gets 200 on valid message data", async () => {
-      mockTelegram.sendMessage.mockReturnValue(Promise.resolve());
       await $fetch("/message", {
         baseURL,
         method: "POST",
@@ -72,7 +64,6 @@ describe.sequential("Message", () => {
     });
 
     it("gets 403 on valid message data but already sended message today", async () => {
-      mockTelegram.sendMessage.mockReturnValue(Promise.resolve());
       await $fetch("/message", {
         baseURL,
         method: "POST",
