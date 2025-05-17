@@ -1,5 +1,3 @@
-import { useTelegram } from "../mocks/telegram";
-
 const baseURL = "http://localhost:3000";
 
 const messageBody = {
@@ -72,6 +70,7 @@ describe.sequential("Message", () => {
           Cookie: `accessToken=${validAccessToken};`,
         },
         body: messageBody,
+        ignoreResponseError: true,
         onResponse: ({ response }) => {
           expect(response.status).toBe(403);
         },
