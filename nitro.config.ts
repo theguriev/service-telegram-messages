@@ -10,6 +10,12 @@ export default defineNitroConfig({
     botToken: "",
     secret: "gurievcreative",
   },
+  experimental: {
+    tasks: true
+  },
+  scheduledTasks: {
+    '0 9 * * *': ['notification:didnt-send']
+  },
   imports: {
     imports: [
       ...(await importsHelper("./db/model")),

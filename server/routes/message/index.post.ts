@@ -14,10 +14,10 @@ export default eventHandler(async (event) => {
     try {
       const telegram = useTelegram();
       const message = await session.withTransaction(async () => {
-        const message = await ModelMessage.create({
+        const message = await ModelMessage.create([{
           userId: user._id,
           ...validated,
-        });
+        }], { session })[0];
 
         const { content, receiverId } = message;
         await telegram.sendMessage(receiverId, content, {
