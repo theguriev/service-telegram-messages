@@ -10,23 +10,18 @@ export default eventHandler(async (event) => {
 
   if (await canSend(event)) {
     const user = await getUser(event);
-    const session = await ModelMessage.startSession();
     try {
       const telegram = useTelegram();
-      const message = await session.withTransaction(async () => {
-        const message = await ModelMessage.create([{
-          userId: user._id,
-          ...validated,
-        }], { session })[0];
+      const message = await ModelMessage.create({
+        userId: user._id,
+        ...validated,
+      });
 
-        const { content, receiverId } = message;
-        await telegram.sendMessage(receiverId, content, {
-          parse_mode: "MarkdownV2",
-          reply_markup: new InlineKeyboard()
-            .url("Показати користувача", `tg://user?id=${user.id}`)
-        });
-
-        return message;
+      const { content, receiverId } = message;
+      await telegram.sendMessage(receiverId, content, {
+        parse_mode: "MarkdownV2",
+        reply_markup: new InlineKeyboard()
+          .url("Показати користувача", `tg://user?id=${user.id}`)
       });
 
       return { message };
@@ -36,8 +31,6 @@ export default eventHandler(async (event) => {
         statusMessage: "Internal Server Error",
         message: `Failed to send message: ${error.message}`,
       });
-    } finally {
-      await session.endSession();
     }
   }
 
