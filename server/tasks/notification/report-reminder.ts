@@ -8,8 +8,7 @@ export default defineTask({
   async run() {
     const telegram = useTelegram();
 
-    const today = subDays(new Date(), 1);
-    const startOfToday = startOfDay(today);
+    const startOfToday = startOfDay(new Date());
 
     const result = await ModelUser.aggregate([
       {
