@@ -1,9 +1,9 @@
-import { startOfDay, subDays } from "date-fns";
+import { startOfDay } from "date-fns";
 
 export default defineTask({
   meta: {
     name: "notification:didnt-send",
-    description: "Sends notifications to managers with users, that didn't send reports",
+    description: "Sends reminders to users, that didn't send report today",
   },
   async run() {
     const telegram = useTelegram();
