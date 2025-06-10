@@ -5,6 +5,10 @@ const messageBody = {
   receiverId: 456,
 };
 
+const selfMessageBody = {
+  content: "Some self message",
+};
+
 describe.sequential("Message", () => {
   const validAccessToken = issueAccessToken(
     { userId: 123 },
@@ -73,6 +77,23 @@ describe.sequential("Message", () => {
         ignoreResponseError: true,
         onResponse: ({ response }) => {
           expect(response.status).toBe(403);
+        },
+      });
+    });
+  });
+
+  describe("POST /message/self", () => {
+    it("gets 204 on valid message data", async () => {
+      await $fetch("/message/self", {
+        baseURL,
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${validAccessToken};`,
+        },
+        body: selfMessageBody,
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(204);
         },
       });
     });

@@ -86,7 +86,7 @@
           }
         },
         "responses": {
-          "200": {
+          "204": {
             "description": "Message sucessfully sent"
           },
           "400": {
