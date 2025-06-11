@@ -72,6 +72,56 @@
         }
       }
     },
+    "/message/self": {
+      "post": {
+        "summary": "Sends message to authorized user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfMessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Message sucessfully sent"
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/message/can-send": {
       "get": {
         "summary": "Check if user can send message",
@@ -116,6 +166,17 @@
           }
         },
         "required": ["content", "receiverId"]
+      },
+      "SelfMessageRequest": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Message content in markdownV2 format",
+            "example": "Hello, this is a test message"
+          }
+        },
+        "required": ["content"]
       },
       "MessageResponse": {
         "type": "object",
