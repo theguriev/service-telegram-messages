@@ -1,5 +1,6 @@
-import { endOfDay, startOfDay, subDays } from "date-fns";
+import { differenceInDays, endOfDay, startOfDay, subDays } from "date-fns";
 import type { InferSchemaType } from 'mongoose';
+import plural from "plural-ru";
 
 export default defineTask({
   meta: {
@@ -29,11 +30,18 @@ export default defineTask({
                 $expr: {
                   $and: [
                     { $eq: [{ $toString: '$userId' }, { $toString: '$$userId' }] },
-                    { $gte: ['$createdAt', startOfYesterday] },
                     { $lte: ['$createdAt', endOfYesterday] },
                   ],
                 },
               },
+            },
+            {
+              $sort: {
+                createdAt: -1,
+              },
+            },
+            {
+              $limit: 1,
             },
           ],
           as: 'messages',
@@ -41,7 +49,17 @@ export default defineTask({
       },
       {
         $match: {
-          messages: { $size: 0 },
+          $or: [
+            { messages: { $size: 0 } },
+            {
+              $expr: {
+                $lt: [
+                  { $arrayElemAt: ['$messages.createdAt', 0] },
+                  startOfYesterday,
+                ],
+              },
+            },
+          ],
         },
       },
       {
@@ -60,10 +78,20 @@ export default defineTask({
     ]);
 
     for (const { managerId, users } of result) {
-      const message = md`Користувачі, які не відіслали звіт вчора:`
+      const message = md`Вчора не скинули звіт наступні користувачі:`
         + "\n"
         + users
-          .map((user: InferSchemaType<typeof schemaUser>) => md`• [${user.firstName} ${user.lastName}](tg://user?id=${user.id})`)
+          .map((user: InferSchemaType<typeof schemaUser> & {
+            messages: InferSchemaType<typeof schemaMessage>[];
+          }) => {
+            const name = [user.firstName, user.lastName].filter(Boolean).join(" ");
+            const message = user.messages[0];
+            const daysDifference = message
+              ? differenceInDays(new Date(), message.createdAt)
+              : differenceInDays(new Date(), user.timestamp);
+            const daysString = plural(daysDifference, "%d день", "%d дні", "%d днів");
+            return md`• [${name}](tg://user?id=${user.id}) \(${daysString} не надсилає звіти\)`
+          })
           .join("\n");
 
       await telegram.sendMessage(managerId, message, {
