@@ -14,8 +14,8 @@ export default defineNitroConfig({
     tasks: true
   },
   scheduledTasks: {
-    '0 9 * * *': ['notification:didnt-send'],
-    '0 21 * * *': ['notification:report-reminder']
+    '0 6 * * *': ['notification:didnt-send'],
+    '0 18 * * *': ['notification:report-reminder']
   },
   imports: {
     imports: [
