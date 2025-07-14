@@ -3,11 +3,11 @@ import { fileURLToPath } from "mlly";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import type { Nitro } from "nitropack";
 import {
-  build,
-  copyPublicAssets,
-  createNitro,
-  prepare,
-  prerender,
+    build,
+    copyPublicAssets,
+    createNitro,
+    prepare,
+    prerender,
 } from "nitropack";
 import { promises as fsp } from "node:fs";
 import { tmpdir } from "node:os";
@@ -45,6 +45,7 @@ const ctx: Context = {
   outDir: resolve(fixtureDir, presetTmpDir, ".output"),
   env: {
     NITRO_BOT_TOKEN: "some:token",
+    NITRO_AUTHORIZATION_BASE: "http://localhost:4000",
     CUSTOM_HELLO_THERE: "general",
     SECRET: "gurievcreative",
   },

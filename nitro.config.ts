@@ -9,6 +9,7 @@ export default defineNitroConfig({
     mongoUri: "mongodb://root:example@localhost:27017/",
     botToken: "",
     secret: "gurievcreative",
+    authorizationBase: "http://localhost:4000",
   },
   experimental: {
     tasks: true

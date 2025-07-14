@@ -1,4 +1,5 @@
 import { startOfDay } from "date-fns";
+import getBalance from "~/utils/getBalance";
 
 export default defineTask({
   meta: {
@@ -6,6 +7,7 @@ export default defineTask({
     description: "Sends reminders to users, that didn't send report today",
   },
   async run() {
+    const { authorizationBase } = useRuntimeConfig();
     const telegram = useTelegram();
 
     const startOfToday = startOfDay(new Date());
@@ -14,6 +16,7 @@ export default defineTask({
       {
         $match: {
           'meta.managerId': { $exists: true, $ne: null },
+          'role': { $nin: ['admin'] },
         },
       },
       {
@@ -42,12 +45,19 @@ export default defineTask({
       },
     ]);
 
-    for (const { id } of result) {
-      const message = md`*Нагадування про звіт* \- Нагадуємо вам про щоденний звіт наставнику\. Просимо зайти в додаток, заповнити необхідну інформацію, та надіслати звіт\.`
+    for (const { _id, id } of result) {
+      try {
+        const balance = await getBalance(authorizationBase, _id);
+        if (balance) {
+          const message = md`*Нагадування про звіт* \- Нагадуємо вам про щоденний звіт наставнику\. Просимо зайти в додаток, заповнити необхідну інформацію, та надіслати звіт\.`
 
-      await telegram.sendMessage(id, message, {
-        parse_mode: "MarkdownV2"
-      });
+          await telegram.sendMessage(id, message, {
+            parse_mode: "MarkdownV2"
+          });
+        }
+      } catch (error) {
+        console.error(`Error sending reminder to user ${_id}:`, error);
+      }
     }
 
     return { result: "Success" };
