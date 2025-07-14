@@ -105,11 +105,14 @@ export default defineTask({
       });
       const userMessages = await Promise.all(userMessagesAsync);
 
+      const filteredMessages = userMessages.filter(Boolean);
+      if (filteredMessages.length === 0) {
+        continue; // Skip sending the message if no valid entries exist
+      }
+
       const message = md`Вчора не скинули звіт наступні користувачі:`
         + "\n"
-        + userMessages
-          .filter(Boolean)
-          .join("\n");
+        + filteredMessages.join("\n");
 
       try {
         await telegram.sendMessage(managerId, message, {
