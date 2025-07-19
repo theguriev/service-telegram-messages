@@ -90,8 +90,8 @@ export default defineTask({
             const name = [user.firstName, user.lastName].filter(Boolean).join(" ");
             const message = user.messages[0];
             const daysDifference = message
-              ? differenceInDays(new Date(), message.createdAt)
-              : differenceInDays(new Date(), user.createdAt);
+              ? differenceInDays(startOfDay(new Date()), startOfDay(message.createdAt))
+              : differenceInDays(startOfDay(new Date()), startOfDay(user.createdAt));
 
             if (daysDifference < 1) return "";
             const daysString = plural(daysDifference, "%d день", "%d дні", "%d днів");
@@ -103,16 +103,14 @@ export default defineTask({
 
         return null;
       });
-      const userMessages = await Promise.all(userMessagesAsync);
+      const userMessages = (await Promise.all(userMessagesAsync))
+        .filter(Boolean);
 
-      const filteredMessages = userMessages.filter(Boolean);
-      if (filteredMessages.length === 0) {
-        continue; // Skip sending the message if no valid entries exist
-      }
+      if (!userMessages.length) continue;
 
       const message = md`Вчора не скинули звіт наступні користувачі:`
         + "\n"
-        + filteredMessages.join("\n");
+        + userMessages.join("\n");
 
       try {
         await telegram.sendMessage(managerId, message, {
