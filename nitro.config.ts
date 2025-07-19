@@ -6,17 +6,17 @@ export default defineNitroConfig({
   srcDir: "server",
   compatibilityDate: "2025-01-26",
   runtimeConfig: {
-    mongoUri: "mongodb://root:example@localhost:27017/",
+    mongoUri: "mongodb://root:donotusemyrootpassword@localhost:27017/",
     botToken: "",
     secret: "gurievcreative",
     authorizationBase: "http://localhost:4000",
   },
   experimental: {
-    tasks: true
+    tasks: true,
   },
   scheduledTasks: {
-    '0 6 * * *': ['notification:didnt-send'],
-    '0 18 * * *': ['notification:report-reminder']
+    "0 6 * * *": ["notification:didnt-send"],
+    "0 18 * * *": ["notification:report-reminder"],
   },
   imports: {
     imports: [
@@ -25,7 +25,7 @@ export default defineNitroConfig({
       { name: "InferSchemaType", from: "mongoose", type: true },
       { name: "parse", from: "set-cookie-parser" },
       { name: "destr", from: "destr" },
-      { name: "md", from: "telegram-escape" }
+      { name: "md", from: "telegram-escape" },
     ],
     presets: [
       {
@@ -34,5 +34,5 @@ export default defineNitroConfig({
       },
     ],
     dirs: ["./server/composables"],
-  }
+  },
 });
