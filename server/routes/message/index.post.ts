@@ -21,7 +21,7 @@ export default eventHandler(async (event) => {
       await telegram.sendMessage(receiverId, content, {
         parse_mode: "MarkdownV2",
         reply_markup: new InlineKeyboard()
-          .url("Показати користувача", `tg://user?id=${user.id}`)
+          .url("Написати користувачеві", `tg://openmessage?user_id=${user.id}`)
       });
 
       return { message };
