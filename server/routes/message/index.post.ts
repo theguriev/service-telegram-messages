@@ -23,6 +23,11 @@ export default eventHandler(async (event) => {
         reply_markup: new InlineKeyboard()
           .url("Показати користувача", `tg://user?id=${user.id}`)
       });
+      await telegram.sendMessage(user.id, content, {
+        parse_mode: "MarkdownV2",
+        reply_markup: new InlineKeyboard()
+          .url("Показати отримувача", `tg://user?id=${receiverId}`)
+      });
 
       return { message };
     } catch (error) {
