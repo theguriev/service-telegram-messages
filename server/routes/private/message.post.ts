@@ -19,7 +19,6 @@ export default eventHandler(async (event) => {
   try {
     const telegram = useTelegram();
     const { content, receiverId, inlineKeyboard } = validated;
-    console.log(inlineKeyboard);
     await telegram.sendMessage(receiverId, content, {
       parse_mode: "MarkdownV2",
       reply_markup: inlineKeyboard?.reduce(
