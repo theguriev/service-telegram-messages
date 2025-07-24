@@ -1,4 +1,5 @@
 import { differenceInDays, endOfDay, startOfDay, subDays } from "date-fns";
+import { InlineKeyboard } from "grammy";
 import type { InferSchemaType, Types } from 'mongoose';
 import plural from "plural-ru";
 
@@ -80,10 +81,11 @@ export default defineTask({
     ]);
 
     for (const { managerId, users } of result) {
-      const userMessagesAsync = users.map(async (user: InferSchemaType<typeof schemaUser> & {
+      const typedUsers = users as (InferSchemaType<typeof schemaUser> & {
         _id: Types.ObjectId;
         messages: InferSchemaType<typeof schemaMessage>[];
-      }) => {
+      })[];
+      const userLinksAsync = typedUsers.map(async (user) => {
         try {
           const balance = await getBalance(authorizationBase, user._id);
           if (balance) {
@@ -95,7 +97,10 @@ export default defineTask({
 
             if (daysDifference < 1) return "";
             const daysString = plural(daysDifference, "%d день", "%d дні", "%d днів");
-            return md`• [${name}](tg://user?id=${user.id}) \(${daysString} не надсилає звіти\)`
+            return {
+              text: `${name} (${daysString} не надсилає звіти)`,
+              url: `tg://user?id=${user.id}`,
+            };
           }
         } catch (error) {
           console.error(`Error sending reminder to user ${user._id}:`, error);
@@ -103,18 +108,17 @@ export default defineTask({
 
         return null;
       });
-      const userMessages = (await Promise.all(userMessagesAsync))
-        .filter(Boolean);
+      const userLinks = (await Promise.all(userLinksAsync))
+        .filter(Boolean) as { text: string; url: string }[];
 
-      if (!userMessages.length) continue;
+      if (!userLinks.length) continue;
 
-      const message = md`Вчора не скинули звіт наступні користувачі:`
-        + "\n"
-        + userMessages.join("\n");
+      const message = md`*Вчора не скинули звіт наступні користувачі*:`;
 
       try {
         await telegram.sendMessage(managerId, message, {
-          parse_mode: "MarkdownV2"
+          parse_mode: "MarkdownV2",
+          reply_markup: userLinks.reduce((acc, { text, url }) => acc.url(text, url).row(), new InlineKeyboard()),
         });
       } catch (error) {
         console.error(`Error sending notification to manager ${managerId}:`, error);

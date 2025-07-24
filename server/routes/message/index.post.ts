@@ -21,12 +21,14 @@ export default eventHandler(async (event) => {
       await telegram.sendMessage(receiverId, content, {
         parse_mode: "MarkdownV2",
         reply_markup: new InlineKeyboard()
+          .url("Показати користувача", `tg://user?id=${user.id}`)
           .url("Написати користувачеві", `tg://openmessage?user_id=${user.id}`)
       });
       await telegram.sendMessage(user.id, content, {
         parse_mode: "MarkdownV2",
         reply_markup: new InlineKeyboard()
           .url("Показати отримувача", `tg://user?id=${receiverId}`)
+          .url("Написати отримувачеві", `tg://openmessage?user_id=${receiverId}`)
       });
 
       return { message };
