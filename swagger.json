@@ -164,7 +164,7 @@
         },
         "responses": {
           "200": {
-            "description": "Message sucessfully sent",
+            "description": "Message successfully sent",
             "content": {
               "application/json": {
                 "schema": {
