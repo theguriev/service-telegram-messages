@@ -222,7 +222,7 @@ describe.sequential("Message", () => {
           expect(response._data.content).toBeTypeOf("string");
         },
       });
-    })
+    });
   });
 
   describe("GET /message/after-wizard/can-send", () => {
