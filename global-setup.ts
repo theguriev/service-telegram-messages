@@ -1,6 +1,7 @@
 import { listen, Listener } from "listhen";
 import { fileURLToPath } from "mlly";
 import { MongoMemoryServer } from "mongodb-memory-server";
+import mongoose from "mongoose";
 import type { Nitro } from "nitropack";
 import {
     build,
@@ -15,6 +16,8 @@ import type { FetchOptions } from "ofetch";
 import { $fetch } from "ofetch";
 import { join, resolve } from "pathe";
 import { joinURL } from "ufo";
+import { adminId, regularId } from "./constants";
+import { clearTestData, seedTestData } from "./test-db-setup";
 
 interface Context {
   preset: string;
@@ -48,6 +51,14 @@ const ctx: Context = {
     NITRO_AUTHORIZATION_BASE: "http://localhost:4000",
     CUSTOM_HELLO_THERE: "general",
     SECRET: "gurievcreative",
+    VALID_ADMIN_ACCESS_TOKEN: issueAccessToken(
+      { userId: adminId, role: "admin", id: adminId },
+      { secret: "gurievcreative" }
+    ),
+    VALID_REGULAR_ACCESS_TOKEN: issueAccessToken(
+      { userId: regularId, role: "user", id: regularId },
+      { secret: "gurievcreative" }
+    ),
   },
   fetch: (url, opts): Promise<Response> =>
     $fetch(joinURL(ctx.server!.url, url.slice(1)), {
@@ -64,6 +75,11 @@ export const setup = async () => {
   const mongod = await MongoMemoryServer.create();
   ctx.mongo = mongod;
   ctx.env.NITRO_MONGO_URI = mongod.getUri();
+
+  await mongoose.connect(ctx.env.NITRO_MONGO_URI);
+
+  await clearTestData();
+  await seedTestData();
 
   // Set environment variables for process compatible presets
   for (const [name, value] of Object.entries(ctx.env)) {

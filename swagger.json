@@ -148,6 +148,100 @@
           }
         }
       }
+    },
+    "/message/after-wizard": {
+      "post": {
+        "summary": "Sends message to selected user after completing the wizard",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageAfterWizardRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message sucessfully sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageAfterWizardResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Message was already sent",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/message/after-wizard/can-send": {
+      "get": {
+        "summary": "Check if user can send message after completing the wizard",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CanSendAfterWizardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -177,6 +271,162 @@
           }
         },
         "required": ["content"]
+      },
+      "MessageAfterWizardRequest": {
+        "type": "object",
+        "properties": {
+          "sex": {
+            "type": "string",
+            "enum": ["male", "female"],
+            "description": "The user's gender",
+            "example": "male"
+          },
+          "firstName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 20,
+            "description": "The user's first name",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 20,
+            "description": "The user's last name",
+            "example": "Doe"
+          },
+          "birthday": {
+            "type": "string",
+            "format": "date",
+            "description": "The user's date of birth",
+            "example": "1990-01-01"
+          },
+          "height": {
+            "type": "number",
+            "description": "The user's height in centimeters",
+            "example": 180
+          },
+          "weight": {
+            "type": "number",
+            "description": "The user's weight in kilograms",
+            "example": 75
+          },
+          "waist": {
+            "type": "number",
+            "description": "The user's waist circumference in centimeters",
+            "example": 80
+          },
+          "shoulder": {
+            "type": "number",
+            "description": "The user's shoulder circumference in centimeters",
+            "example": 100
+          },
+          "hip": {
+            "type": "number",
+            "description": "The user's hip circumference in centimeters",
+            "example": 60
+          },
+          "hips": {
+            "type": "number",
+            "description": "The user's hips circumference in centimeters",
+            "example": 95
+          },
+          "chest": {
+            "type": "number",
+            "description": "The user's chest circumference in centimeters",
+            "example": 90
+          },
+          "contraindications": {
+            "type": "string",
+            "nullable": true,
+            "description": "Medical contraindications for exercises",
+            "example": "Hypertension"
+          },
+          "eatingDisorder": {
+            "type": "string",
+            "nullable": true,
+            "description": "Eating disorders or dietary habits",
+            "example": "Overeating issues"
+          },
+          "spineIssues": {
+            "type": "string",
+            "nullable": true,
+            "description": "Spine, knee, kidney, or other health issues",
+            "example": "Scoliosis"
+          },
+          "endocrineDisorders": {
+            "type": "string",
+            "nullable": true,
+            "description": "Endocrine disorders",
+            "example": "Diabetes"
+          },
+          "physicalActivity": {
+            "type": "string",
+            "description": "Physical activity level over the past year",
+            "example": "Regular gym workouts"
+          },
+          "foodIntolerances": {
+            "type": "string",
+            "nullable": true,
+            "description": "Food intolerances",
+            "example": "Lactose intolerance"
+          },
+          "goalWeight": {
+            "type": "number",
+            "minimum": 1,
+            "description": "The user's target weight in kilograms",
+            "example": 70
+          },
+          "whereDoSports": {
+            "type": "string",
+            "enum": ["gym", "home"],
+            "description": "Where the user plans to exercise",
+            "example": "gym"
+          },
+          "isGaveBirth": {
+            "type": "string",
+            "enum": ["no", "yes"],
+            "nullable": true,
+            "description": "Whether the user has given birth",
+            "example": "yes"
+          },
+          "gaveBirth": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "The date of childbirth, if applicable",
+            "example": "2020-05-15"
+          },
+          "breastfeeding": {
+            "type": "string",
+            "enum": ["no", "yes"],
+            "nullable": true,
+            "description": "Whether the user is breastfeeding",
+            "example": "no"
+          },
+          "receiverId": {
+            "type": "number",
+            "description": "The ID of the message receiver",
+            "example": 379669527
+          }
+        },
+        "required": [
+          "sex",
+          "firstName",
+          "lastName",
+          "birthday",
+          "height",
+          "weight",
+          "waist",
+          "shoulder",
+          "hip",
+          "hips",
+          "chest",
+          "physicalActivity",
+          "goalWeight",
+          "whereDoSports",
+          "receiverId"
+        ]
       },
       "MessageResponse": {
         "type": "object",
@@ -219,7 +469,26 @@
           }
         }
       },
+      "MessageAfterWizardResponse": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Personalized message content after completing the wizard",
+            "example": "Thank you for completing the wizard! Here is your personalized message."
+          }
+        }
+      },
       "CanSendResponse": {
+        "type": "object",
+        "properties": {
+          "canSend": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "CanSendAfterWizardResponse": {
         "type": "object",
         "properties": {
           "canSend": {
