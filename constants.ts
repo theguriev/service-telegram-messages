@@ -9,3 +9,6 @@ export const imports: Parameters<typeof Unimport.vite>[0]['imports'] = [
   { name: 'v4', as: 'uuidv4', from: 'uuid' },
   { name: 'parse', from: 'set-cookie-parser' },
 ];
+
+export const adminId = "6808bcfb77143eceb802c5a7";
+export const regularId = "6808bcfb77143eceb802c5a8";
