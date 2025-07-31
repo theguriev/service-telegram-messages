@@ -1,4 +1,5 @@
 import { InlineKeyboard } from "grammy";
+import { weekends } from "~~/constants";
 
 const requestBodySchema = z.object({
   content: z.string(),
@@ -10,20 +11,43 @@ export default eventHandler(async (event) => {
 
   if (await canSend(event)) {
     const user = await getUser(event);
+    const previousMessages = await ModelMessage.find({
+      userId: user._id,
+      didntSend: true,
+    }).sort({ createdAt: 1 });
+
     try {
       const telegram = useTelegram();
-      const message = await ModelMessage.create({
-        userId: user._id,
-        ...validated,
-      });
+      const { content, receiverId } = validated;
+      const isWeekend = weekends.includes(new Date().getDay());
 
-      const { content, receiverId } = message;
-      await telegram.sendMessage(receiverId, content, {
-        parse_mode: "MarkdownV2",
-        reply_markup: new InlineKeyboard()
-          .url("Показати користувача", `tg://user?id=${user.id}`)
-          .url("Написати користувачеві", `tg://openmessage?user_id=${user.id}`)
-      });
+      if (!isWeekend) {
+        const fullContent = previousMessages.length
+          ? previousMessages.map((message) =>
+              md`*Повідомлення за ${message.createdAt.toLocaleDateString("uk-UA")}:*` +
+              "\n" +
+              message.content
+            ).join("\n\n" + md`${"------------------------------------------------------"}` + "\n\n") +
+            "\n\n" + md`${"------------------------------------------------------"}` + "\n\n" +
+            md`*Поточне повідомлення:*` +
+            "\n" +
+            content
+          : content;
+
+        await telegram.sendMessage(receiverId, fullContent, {
+          parse_mode: "MarkdownV2",
+          reply_markup: new InlineKeyboard()
+            .url("Показати користувача", `tg://user?id=${user.id}`)
+            .url("Написати користувачеві", `tg://openmessage?user_id=${user.id}`)
+        });
+
+        await Promise.all(
+          previousMessages.map(async (message) => {
+            message.didntSend = false;
+            await message.save();
+          })
+        );
+      }
       await telegram.sendMessage(user.id, content, {
         parse_mode: "MarkdownV2",
         reply_markup: new InlineKeyboard()
@@ -31,6 +55,11 @@ export default eventHandler(async (event) => {
           .url("Написати отримувачеві", `tg://openmessage?user_id=${receiverId}`)
       });
 
+      const message = await ModelMessage.create({
+        userId: user._id,
+        didntSend: isWeekend,
+        ...validated,
+      });
       return { message };
     } catch (error) {
       throw createError({
