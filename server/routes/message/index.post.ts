@@ -22,13 +22,14 @@ export default eventHandler(async (event) => {
       const isWeekend = weekends.includes(new Date().getDay());
 
       if (!isWeekend) {
+        const separator = "\n\n" + md`${"------------------------------------------------------"}` + "\n\n";
         const fullContent = previousMessages.length
           ? previousMessages.map((message) =>
               md`*Повідомлення за ${message.createdAt.toLocaleDateString("uk-UA")}:*` +
               "\n" +
               message.content
-            ).join("\n\n" + md`${"------------------------------------------------------"}` + "\n\n") +
-            "\n\n" + md`${"------------------------------------------------------"}` + "\n\n" +
+            ).join(separator) +
+            separator +
             md`*Поточне повідомлення:*` +
             "\n" +
             content
