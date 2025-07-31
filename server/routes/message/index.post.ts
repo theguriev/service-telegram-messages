@@ -41,11 +41,9 @@ export default eventHandler(async (event) => {
             .url("Написати користувачеві", `tg://openmessage?user_id=${user.id}`)
         });
 
-        await Promise.all(
-          previousMessages.map(async (message) => {
-            message.didntSend = false;
-            await message.save();
-          })
+        await ModelMessage.updateMany(
+          { _id: { $in: previousMessages.map((message) => message._id) } },
+          { $set: { didntSend: false } }
         );
       }
       await telegram.sendMessage(user.id, content, {
