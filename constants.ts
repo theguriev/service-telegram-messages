@@ -12,3 +12,4 @@ export const imports: Parameters<typeof Unimport.vite>[0]['imports'] = [
 
 export const adminId = "6808bcfb77143eceb802c5a7";
 export const regularId = "6808bcfb77143eceb802c5a8";
+export const weekends = [6 /* Saturday */];

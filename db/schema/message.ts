@@ -15,6 +15,10 @@ const messageSchema = new Schema(
       type: Number,
       required: true,
     },
+    didntSend: {
+      type: Boolean,
+      required: false,
+    },
   },
   { timestamps: true }
 );
