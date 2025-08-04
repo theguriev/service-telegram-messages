@@ -485,6 +485,6 @@ describe.sequential("Message", () => {
           expect(response._data.canSend).toBe(true);
         },
       });
-    })
+    });
   });
 });
