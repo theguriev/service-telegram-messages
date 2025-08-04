@@ -434,7 +434,7 @@ describe.sequential("Message", () => {
       });
     });
 
-    it("gets 403 on valid message data but already sended message with those measurements", async () => {
+    it("gets 403 on valid message data but already sent message with those measurements", async () => {
       await $fetch("/message/measurements", {
         baseURL,
         method: "POST",
