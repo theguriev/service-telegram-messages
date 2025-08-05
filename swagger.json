@@ -680,6 +680,11 @@
       "MeasurementMessageResponse": {
         "type": "object",
         "properties": {
+          "content": {
+            "type": "string",
+            "description": "Message content in markdownV2 format",
+            "example": "Your measurements have been successfully recorded."
+          },
           "message": {
             "type": "object",
             "properties": {
