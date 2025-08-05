@@ -315,11 +315,69 @@
         "summary": "Check if measurements can be sent",
         "parameters": [
           {
-            "name": "query",
+            "name": "weight",
+            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
             "in": "query",
             "required": true,
             "schema": {
-              "$ref": "#/components/schemas/MeasurementQueryParameters"
+              "type": "string",
+              "pattern": "^[a-fA-F0-9]{24}$",
+              "description": "ObjectId of the weight measurement"
+            }
+          },
+          {
+            "name": "waist",
+            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-fA-F0-9]{24}$",
+              "description": "ObjectId of the waist measurement"
+            }
+          },
+          {
+            "name": "shoulder",
+            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-fA-F0-9]{24}$",
+              "description": "ObjectId of the shoulder measurement"
+            }
+          },
+          {
+            "name": "hip",
+            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-fA-F0-9]{24}$",
+              "description": "ObjectId of the hip measurement"
+            }
+          },
+          {
+            "name": "hips",
+            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-fA-F0-9]{24}$",
+              "description": "ObjectId of the hips measurement"
+            }
+          },
+          {
+            "name": "chest",
+            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-fA-F0-9]{24}$",
+              "description": "ObjectId of the chest measurement"
             }
           }
         ],
@@ -745,36 +803,6 @@
             }
           }
         }
-      },
-      "MeasurementQueryParameters": {
-        "type": "object",
-        "properties": {
-          "weight": {
-            "type": "string",
-            "description": "ObjectId of the weight measurement"
-          },
-          "waist": {
-            "type": "string",
-            "description": "ObjectId of the waist measurement"
-          },
-          "shoulder": {
-            "type": "string",
-            "description": "ObjectId of the shoulder measurement"
-          },
-          "hip": {
-            "type": "string",
-            "description": "ObjectId of the hip measurement"
-          },
-          "hips": {
-            "type": "string",
-            "description": "ObjectId of the hips measurement"
-          },
-          "chest": {
-            "type": "string",
-            "description": "ObjectId of the chest measurement"
-          }
-        },
-        "required": ["weight", "waist", "shoulder", "hip", "hips", "chest"]
       },
       "ErrorResponse": {
         "type": "object",
