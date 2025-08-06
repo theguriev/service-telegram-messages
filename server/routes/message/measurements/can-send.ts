@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-import canSendMeasurementMessage from "~/utils/canSendMeasurementMessage";
 
 const requestQuerySchema = z.object({
   weight: z.string().refine(Types.ObjectId.isValid),
