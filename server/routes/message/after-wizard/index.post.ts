@@ -72,7 +72,7 @@ export default eventHandler(async (event) => {
           conversion: (value) => `${value} см`,
         },
         hip: {
-          name: "Стегно",
+          name: "Стегно (см)",
           conversion: (value) => `${value} см`,
         },
         hips: {

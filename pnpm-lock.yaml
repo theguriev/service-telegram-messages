@@ -11,18 +11,12 @@ importers:
       '@grammyjs/auto-retry':
         specifier: ^2.0.2
         version: 2.0.2(grammy@1.36.1)
-      big.js:
-        specifier: ^7.0.1
-        version: 7.0.1
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
       destr:
         specifier: ^2.0.5
         version: 2.0.5
-      es-toolkit:
-        specifier: ^1.39.8
-        version: 1.39.8
       grammy:
         specifier: ^1.36.1
         version: 1.36.1
@@ -51,9 +45,6 @@ importers:
         specifier: ^3.24.1
         version: 3.24.1
     devDependencies:
-      '@types/big.js':
-        specifier: ^6.2.2
-        version: 6.2.2
       '@types/jsonwebtoken':
         specifier: ^9.0.9
         version: 9.0.9
@@ -659,9 +650,6 @@ packages:
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
-  '@types/big.js@6.2.2':
-    resolution: {integrity: sha512-e2cOW9YlVzFY2iScnGBBkplKsrn2CsObHQ2Hiw4V1sSyiGbgWL8IyqE3zFi1Pt5o1pdAtYkDAIsF3KKUPjdzaA==}
-
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
 
@@ -819,9 +807,6 @@ packages:
 
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
-
-  big.js@7.0.1:
-    resolution: {integrity: sha512-iFgV784tD8kq4ccF1xtNMZnXeZzVuXWWM+ERFzKQjv+A5G9HC8CY3DuV45vgzFFcW+u2tIvmF95+AzWgs6BjCg==}
 
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
@@ -1162,9 +1147,6 @@ packages:
   es-object-atoms@1.1.1:
     resolution: {integrity: sha512-FGgH2h8zKNim9ljj7dankFPcICIK9Cp5bm+c2gQSYePhpaG5+esrLODihIorn+Pe6FGJzWhXQotPv73jTaldXA==}
     engines: {node: '>= 0.4'}
-
-  es-toolkit@1.39.8:
-    resolution: {integrity: sha512-A8QO9TfF+rltS8BXpdu8OS+rpGgEdnRhqIVxO/ZmNvnXBYgOdSsxukT55ELyP94gZIntWJ+Li9QRrT2u1Kitpg==}
 
   esbuild@0.24.2:
     resolution: {integrity: sha512-+9egpBW8I3CD5XPe0n6BfT5fxLzxrlDzqydF3aviG+9ni1lDC/OvMHcxqEFV0+LANZG5R1bFMWfUrjVsdwxJvA==}
@@ -3163,8 +3145,6 @@ snapshots:
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
-  '@types/big.js@6.2.2': {}
-
   '@types/estree@1.0.6': {}
 
   '@types/http-proxy@1.17.15':
@@ -3332,8 +3312,6 @@ snapshots:
     optional: true
 
   base64-js@1.5.1: {}
-
-  big.js@7.0.1: {}
 
   binary-extensions@2.3.0: {}
 
@@ -3619,8 +3597,6 @@ snapshots:
   es-object-atoms@1.1.1:
     dependencies:
       es-errors: 1.3.0
-
-  es-toolkit@1.39.8: {}
 
   esbuild@0.24.2:
     optionalDependencies:
