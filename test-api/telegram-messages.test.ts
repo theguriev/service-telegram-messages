@@ -253,7 +253,7 @@ describe.sequential("Message", () => {
           Accept: "application/json",
           Cookie: `accessToken=${regularAccessToken};`,
         },
-        params: {
+        query: {
           startDate: addDays(new Date(), 1).toISOString(),
         },
         onResponse: ({ response }) => {
@@ -271,7 +271,7 @@ describe.sequential("Message", () => {
           Accept: "application/json",
           Cookie: `accessToken=${regularAccessToken};`,
         },
-        params: {
+        query: {
           endDate: subDays(new Date(), 1).toISOString(),
         },
         onResponse: ({ response }) => {
@@ -289,7 +289,7 @@ describe.sequential("Message", () => {
           Accept: "application/json",
           Cookie: `accessToken=${regularAccessToken};`,
         },
-        params: {
+        query: {
           startDate: subDays(new Date(), 1).toISOString(),
           endDate: addDays(new Date(), 1).toISOString(),
         },
