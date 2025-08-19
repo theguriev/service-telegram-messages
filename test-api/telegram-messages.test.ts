@@ -1,3 +1,4 @@
+import { addDays, subDays } from "date-fns";
 import { omit } from "es-toolkit";
 import { regularId } from "../constants";
 
@@ -107,6 +108,56 @@ describe.sequential("Message", () => {
     });
   });
 
+  describe("GET /message", () => {
+    it("gets 401 on authorization error", async () => {
+      await $fetch("/message", {
+        baseURL,
+        method: "GET",
+        ignoreResponseError: true,
+        headers: {
+          Accept: "application/json",
+        },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(401);
+        },
+      });
+    });
+
+    it("gets 400 on validation error", async () => {
+      await $fetch("/message", {
+        baseURL,
+        method: "GET",
+        ignoreResponseError: true,
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${regularAccessToken};`,
+        },
+        query: {
+          startDate: "invalid",
+          endDate: "invalid",
+        },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(400);
+        },
+      });
+    })
+
+    it("gets 200 with empty messages", async () => {
+      await $fetch("/message", {
+        baseURL,
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${regularAccessToken};`,
+        },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(200);
+          expect(response._data).toEqual([]);
+        },
+      });
+    });
+  });
+
   describe("POST /message", () => {
     it("gets 400 on validation errors", async () => {
       await $fetch("/message", {
@@ -173,6 +224,86 @@ describe.sequential("Message", () => {
       });
     });
   });
+
+  describe("GET /message", () => {
+    it("gets 200 with message data", async () => {
+      await $fetch("/message", {
+        baseURL,
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${regularAccessToken};`,
+        },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(200);
+          expect(response._data).toBeInstanceOf(Array);
+          expect(response._data).toHaveLength(1);
+          expect(response._data[0]).toBeInstanceOf(Object);
+          expect(response._data[0].content).toBe(messageBody.content);
+          expect(response._data[0].receiverId).toBe(messageBody.receiverId);
+        },
+      });
+    });
+
+    it("gets 200 by too big start date with empty message data", async () => {
+      await $fetch("/message", {
+        baseURL,
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${regularAccessToken};`,
+        },
+        params: {
+          startDate: addDays(new Date(), 1).toISOString(),
+        },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(200);
+          expect(response._data).toEqual([]);
+        },
+      });
+    });
+
+    it("gets 200 by too small end date with empty message data", async () => {
+      await $fetch("/message", {
+        baseURL,
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${regularAccessToken};`,
+        },
+        params: {
+          endDate: subDays(new Date(), 1).toISOString(),
+        },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(200);
+          expect(response._data).toEqual([]);
+        },
+      });
+    });
+
+    it("gets 200 by valid date with message data", async () => {
+      await $fetch("/message", {
+        baseURL,
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${regularAccessToken};`,
+        },
+        params: {
+          startDate: subDays(new Date(), 1).toISOString(),
+          endDate: addDays(new Date(), 1).toISOString(),
+        },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(200);
+          expect(response._data).toBeInstanceOf(Array);
+          expect(response._data).toHaveLength(1);
+          expect(response._data[0]).toBeInstanceOf(Object);
+          expect(response._data[0].content).toBe(messageBody.content);
+          expect(response._data[0].receiverId).toBe(messageBody.receiverId);
+        },
+      });
+    });
+  })
 
   describe("GET /message/can-send", () => {
     it("gets 200 with false after message sending", async () => {
