@@ -303,7 +303,7 @@ describe.sequential("Message", () => {
         },
       });
     });
-  })
+  });
 
   describe("GET /message/can-send", () => {
     it("gets 200 with false after message sending", async () => {
