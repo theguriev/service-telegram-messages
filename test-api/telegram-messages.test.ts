@@ -140,7 +140,7 @@ describe.sequential("Message", () => {
           expect(response.status).toBe(400);
         },
       });
-    })
+    });
 
     it("gets 200 with empty messages", async () => {
       await $fetch("/message", {
