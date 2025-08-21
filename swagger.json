@@ -80,10 +80,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/MessageResponse"
-                  }
+                  "$ref": "#/components/schemas/MessagesResponse"
                 }
               }
             }
@@ -704,50 +701,61 @@
           "receiverId"
         ]
       },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "64e0f3b2c4d5f8a1b2c4d5f8a"
+          },
+          "userId": {
+            "type": "string",
+            "example": "379669527"
+          },
+          "content": {
+            "type": "string",
+            "description": "Message content in markdownV2 format",
+            "example": "Hello, this is a test message"
+          },
+          "receiverId": {
+            "type": "number",
+            "example": 379669527
+          },
+          "didntSend": {
+            "type": "boolean",
+            "example": false
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-10-01T12:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-10-01T12:00:00Z"
+          },
+          "__v": {
+            "type": "number",
+            "example": 0
+          }
+        },
+        "required": ["_id", "userId", "content", "receiverId", "createdAt", "updatedAt", "__v"]
+      },
+      "MessagesResponse": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Message"
+        }
+      },
       "MessageResponse": {
         "type": "object",
         "properties": {
           "message": {
-            "type": "object",
-            "properties": {
-              "_id": {
-                "type": "string",
-                "example": "64e0f3b2c4d5f8a1b2c4d5f8a"
-              },
-              "userId": {
-                "type": "string",
-                "example": "379669527"
-              },
-              "content": {
-                "type": "string",
-                "description": "Message content in markdownV2 format",
-                "example": "Hello, this is a test message"
-              },
-              "receiverId": {
-                "type": "number",
-                "example": 379669527
-              },
-              "didntSend": {
-                "type": "boolean",
-                "example": false
-              },
-              "createdAt": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2023-10-01T12:00:00Z"
-              },
-              "updatedAt": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2023-10-01T12:00:00Z"
-              },
-              "__v": {
-                "type": "number",
-                "example": 0
-              }
-            }
+            "$ref": "#/components/schemas/Message"
           }
-        }
+        },
+        "required": ["message"]
       },
       "MessageAfterWizardResponse": {
         "type": "object",
