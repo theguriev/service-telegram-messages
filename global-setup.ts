@@ -49,6 +49,7 @@ const ctx: Context = {
   env: {
     NITRO_BOT_TOKEN: "some:token",
     NITRO_AUTHORIZATION_BASE: "http://localhost:4000",
+    NITRO_APP_URL: "https://domain.ngrok-free.app",
     CUSTOM_HELLO_THERE: "general",
     SECRET: "gurievcreative",
     VALID_ADMIN_ACCESS_TOKEN: issueAccessToken(

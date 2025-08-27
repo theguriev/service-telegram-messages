@@ -3,6 +3,7 @@ import importsHelper from "./importsHelper";
 
 //https://nitro.unjs.io/config
 export default defineNitroConfig({
+  inlineDynamicImports: true,
   srcDir: "server",
   compatibilityDate: "2025-01-26",
   runtimeConfig: {
@@ -10,6 +11,7 @@ export default defineNitroConfig({
     botToken: "",
     secret: "gurievcreative",
     authorizationBase: "http://localhost:4000",
+    appUrl: "https://domain.ngrok-free.app",
   },
   experimental: {
     tasks: true,
@@ -26,6 +28,7 @@ export default defineNitroConfig({
       { name: "parse", from: "set-cookie-parser" },
       { name: "destr", from: "destr" },
       { name: "md", from: "telegram-escape" },
+      { name: "useTelegram", from: "~/telegram" }
     ],
     presets: [
       {
@@ -33,6 +36,6 @@ export default defineNitroConfig({
         imports: ["z"],
       },
     ],
-    dirs: ["./server/composables"],
+    dirs: ["./server/composables", "./types", "./server/telegram/utils"],
   },
 });
