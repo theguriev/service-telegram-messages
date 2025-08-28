@@ -1,7 +1,6 @@
-import { addDays, differenceInDays, startOfDay } from "date-fns";
+import { addDays, differenceInDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { groupBy, sumBy } from "es-toolkit";
-import { dateDifference } from "../../../constants";
 import { Set } from "../../../types/aggregateModels";
 
 type ArrayType<T extends readonly unknown[]> =
@@ -33,13 +32,6 @@ type ReportQueryParams<TWord extends string> = Omit<ManagedQueryParams<TWord>, '
   date: () => Date;
   selfArticle: Omit<ManagedQueryParams<TWord>['selfArticle'], 'text'>;
   managedArticle: Omit<ManagedQueryParams<TWord>['managedArticle'], 'text'>;
-};
-
-const resolveStartDate = (date: Date) => {
-  const startDate = startOfDay(date);
-  const zonedDate = toZonedTime(date, "Europe/Kyiv");
-  const difference = date.getTime() - zonedDate.getTime();
-  return new Date(startDate.getTime() + dateDifference.valueOf() + difference);
 };
 
 const getText = async (date: Date, user: ReportUser) => {

@@ -155,6 +155,21 @@ const defineManagedInlineQuery = <
           ],
         },
       },
+      {
+        $addFields: {
+          isCurrentUser: {
+            $eq: ["$_id", currentUser._id]
+          }
+        }
+      },
+      {
+        $sort: {
+          isCurrentUser: -1,
+        }
+      },
+      {
+        $unset: "isCurrentUser"
+      },
       ...(Array.isArray(awaitedCustomPipelineResult)
         ? awaitedCustomPipelineResult
         : [awaitedCustomPipelineResult]),

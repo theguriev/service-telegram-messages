@@ -29,7 +29,6 @@ export default defineNitroPlugin(async (nitro) => {
         };
 
         const results: InlineQueryResult[] = [];
-        let leftResults = 50;
         let newOffset: [number, number] | [] = [];
         for (const [index, request] of inlineQueries.slice(offsetStep).entries()) {
           const result = request({
@@ -39,7 +38,7 @@ export default defineNitroPlugin(async (nitro) => {
             currentUser,
             getPhotoUrl,
             offset: index ? 0 : offset,
-            limit: leftResults
+            limit: 50 - results.length
           });
           let awaitedResult: InlineQueryReturnType;
           if (result instanceof Promise) {
@@ -50,10 +49,9 @@ export default defineNitroPlugin(async (nitro) => {
 
           const transformedResult = Array.isArray(awaitedResult) ? awaitedResult : [awaitedResult];
           results.push(...transformedResult);
-          leftResults = 50 - results.length;
-          if (leftResults <= 0) {
+          if (results.length >= 50) {
             const currentOffset = index ? transformedResult.length : offset + transformedResult.length;
-            newOffset = [offsetStep + index, offset + results.length];
+            newOffset = [offsetStep + index, currentOffset + results.length];
             break;
           }
         }
