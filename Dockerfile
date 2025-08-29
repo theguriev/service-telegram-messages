@@ -16,6 +16,9 @@ COPY . .
 # Install app dependencies
 RUN pnpm install
 
+# Install fonts
+RUN apk add --no-cache ttf-dejavu ttf-liberation
+
 # build app
 RUN pnpm run build
 

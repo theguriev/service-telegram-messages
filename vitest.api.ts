@@ -20,7 +20,7 @@ export default defineConfig({
           from: "./db/schema/user.ts",
         },
       ],
-      dirs: ["./server/utils"],
+      dirs: ["./server/utils", "./types", "./server/telegram/utils"],
       dts: true,
     }),
   ],
