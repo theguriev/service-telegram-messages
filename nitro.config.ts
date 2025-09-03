@@ -24,11 +24,14 @@ export default defineNitroConfig({
     imports: [
       ...(await importsHelper("./db/model")),
       ...(await importsHelper("./db/schema", camelCase)),
+      ...(await importsHelper("./server/permission", camelCase)),
       { name: "InferSchemaType", from: "mongoose", type: true },
       { name: "parse", from: "set-cookie-parser" },
       { name: "destr", from: "destr" },
       { name: "md", from: "telegram-escape" },
-      { name: "useTelegram", from: "~/telegram" }
+      { name: "useTelegram", from: "~/telegram" },
+      { name: "can", from: "~/permission" },
+      { name: "matchCan", from: "~/permission" },
     ],
     presets: [
       {

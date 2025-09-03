@@ -3,7 +3,7 @@ import getBalance from "~/utils/getBalance";
 
 export default defineTask({
   meta: {
-    name: "notification:didnt-send",
+    name: "notification:report-reminder",
     description: "Sends reminders to users, that didn't send report today",
   },
   async run() {
@@ -16,7 +16,7 @@ export default defineTask({
       {
         $match: {
           'meta.managerId': { $exists: true, $ne: null },
-          'role': { $nin: ['admin'] },
+          ...matchCan("notification:report-reminder")
         },
       },
       {
