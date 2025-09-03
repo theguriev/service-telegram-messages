@@ -34,6 +34,9 @@ export default defineTask({
                 },
               },
             },
+            {
+              $limit: 1
+            }
           ],
           as: 'messages',
         },
