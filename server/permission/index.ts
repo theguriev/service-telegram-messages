@@ -5,6 +5,7 @@ const permissions = {
   admin: permissionAdmin,
   manager: permissionManager,
   user: permissionUser,
+  "template-manager": permissionTemplateManager,
 } as const;
 
 export const can = (user: HydratedDocument<InferSchemaType<typeof schemaUser>>, permission: string | string[]) => {
