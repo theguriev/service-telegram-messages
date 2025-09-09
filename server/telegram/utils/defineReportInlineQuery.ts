@@ -1,6 +1,7 @@
 import { addDays, differenceInDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { groupBy, sumBy } from "es-toolkit";
+import { InlineKeyboard } from "grammy";
 import { Set } from "../../../types/aggregateModels";
 
 type ArrayType<T extends readonly unknown[]> =
@@ -30,8 +31,8 @@ interface ReportUser extends User {
 type ManagedQueryParams<TWord extends string> = Parameters<typeof defineManagedInlineQuery<TWord, ReportUser>>[0];
 type ReportQueryParams<TWord extends string> = Omit<ManagedQueryParams<TWord>, 'selfArticle' | 'managedArticle' | 'customPipeline'> & {
   date: () => Date;
-  selfArticle: Omit<ManagedQueryParams<TWord>['selfArticle'], 'text'>;
-  managedArticle: Omit<ManagedQueryParams<TWord>['managedArticle'], 'text'>;
+  selfArticle: Omit<ManagedQueryParams<TWord>['selfArticle'], 'text' | 'textOptions' | 'reply_markup'>;
+  managedArticle: Omit<ManagedQueryParams<TWord>['managedArticle'], 'text' | 'textOptions' | 'reply_markup'>;
 };
 
 const getText = async (date: Date, user: ReportUser) => {
@@ -164,6 +165,8 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
     selfArticle: {
       ...params.selfArticle,
       text: (user) => getText(params.date(), user),
+      reply_markup: (user, { ctx, config: { telegramApp } }) => new InlineKeyboard()
+        .url("Перейти до користувача", `https://t.me/${ctx.me.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`),
       textOptions: {
         parse_mode: "MarkdownV2",
       }
@@ -171,6 +174,8 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
     managedArticle: {
       ...params.managedArticle,
       text: (user) => getText(params.date(), user),
+      reply_markup: (user, { ctx, config: { telegramApp } }) => new InlineKeyboard()
+        .url("Перейти до користувача", `https://t.me/${ctx.me.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`),
       textOptions: {
         parse_mode: "MarkdownV2",
       }
