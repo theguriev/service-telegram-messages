@@ -1,6 +1,7 @@
 import Big from "big.js";
 import { addDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import { InlineKeyboard } from "grammy";
 
 interface MeasurementsUser extends User {
   measurements: {
@@ -15,8 +16,8 @@ interface MeasurementsUser extends User {
 type ManagedQueryParams<TWord extends string> = Parameters<typeof defineManagedInlineQuery<TWord, MeasurementsUser>>[0];
 type MeasurementQueryParams<TWord extends string> = Omit<ManagedQueryParams<TWord>, 'selfArticle' | 'managedArticle' | 'customPipeline'> & {
   date: () => Date;
-  selfArticle: Omit<ManagedQueryParams<TWord>['selfArticle'], 'text'>;
-  managedArticle: Omit<ManagedQueryParams<TWord>['managedArticle'], 'text'>;
+  selfArticle: Omit<ManagedQueryParams<TWord>['selfArticle'], 'text' | 'textOptions' | 'reply_markup'>;
+  managedArticle: Omit<ManagedQueryParams<TWord>['managedArticle'], 'text' | 'textOptions' | 'reply_markup'>;
 };
 
 const fields: Record<string, {
@@ -154,6 +155,8 @@ const defineMeasurementsInlineQuery = <TWord extends string>(params: Measurement
     selfArticle: {
       ...params.selfArticle,
       text: (user) => getText(params.date(), user),
+      reply_markup: (user, { ctx, config: { telegramApp } }) => new InlineKeyboard()
+        .url("Перейти до користувача", `https://t.me/${ctx.me.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`),
       textOptions: {
         parse_mode: "MarkdownV2",
       }
@@ -161,6 +164,8 @@ const defineMeasurementsInlineQuery = <TWord extends string>(params: Measurement
     managedArticle: {
       ...params.managedArticle,
       text: (user) => getText(params.date(), user),
+      reply_markup: (user, { ctx, config: { telegramApp } }) => new InlineKeyboard()
+        .url("Перейти до користувача", `https://t.me/${ctx.me.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`),
       textOptions: {
         parse_mode: "MarkdownV2",
       }
