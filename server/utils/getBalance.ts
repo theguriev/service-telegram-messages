@@ -1,16 +1,16 @@
-import type { Types } from "mongoose";
+import { bllsBase } from "~~/constants";
 
-const getBalance = async (base: string, userId: Types.ObjectId | string) => {
-  const { balance } = await $fetch<{ balance: number }>(`/private/balance/${userId}`, {
+const getBalance = async (address: string, currencySymbol: string) => {
+  const balance = await $fetch<Record<string, number>>(`/billing/ballance/${address}`, {
     retry: 5,
     retryDelay: 1000,
-    baseURL: base,
+    baseURL: bllsBase,
     method: "GET",
     headers: {
       Accept: "application/json",
     },
   });
-  return balance;
+  return balance?.[currencySymbol];
 };
 
 export default getBalance;
