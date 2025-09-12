@@ -13,6 +13,7 @@ export default defineNitroConfig({
     authorizationBase: "http://localhost:4000",
     appUrl: "https://domain.ngrok-free.app",
     telegramApp: "nauka",
+    currencySymbol: "nka",
   },
   experimental: {
     tasks: true,

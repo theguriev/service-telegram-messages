@@ -35,7 +35,7 @@ type ReportQueryParams<TWord extends string> = Omit<ManagedQueryParams<TWord>, '
   managedArticle: Omit<ManagedQueryParams<TWord>['managedArticle'], 'text' | 'textOptions' | 'reply_markup'>;
 };
 
-const getText = async (date: Date, user: ReportUser) => {
+const getText = async (date: Date, user: ReportUser, currencySymbol: string) => {
   const { notes, sets, measurements } = user;
   const startDate = resolveStartDate(date);
   const endDate = addDays(startDate, 1);
@@ -45,6 +45,7 @@ const getText = async (date: Date, user: ReportUser) => {
   const goal = user.meta?.stepsGoal ?? 7000;
 
   const transaction = await getAllTransactions({
+    symbol: currencySymbol,
     order: 'desc',
   }, (transaction) => transaction.to === user.address);
   const message = transaction ? user.messages.find(message => message.createdAt.getTime() >= transaction.timestamp) : undefined;
@@ -164,7 +165,7 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
     ...params,
     selfArticle: {
       ...params.selfArticle,
-      text: (user) => getText(params.date(), user),
+      text: (user, { config: { currencySymbol } }) => getText(params.date(), user, currencySymbol),
       reply_markup: (user, { ctx, config: { telegramApp } }) => new InlineKeyboard()
         .url("Перейти до користувача", `https://t.me/${ctx.me.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`),
       textOptions: {
@@ -173,7 +174,7 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
     },
     managedArticle: {
       ...params.managedArticle,
-      text: (user) => getText(params.date(), user),
+      text: (user, { config: { currencySymbol } }) => getText(params.date(), user, currencySymbol),
       reply_markup: (user, { ctx, config: { telegramApp } }) => new InlineKeyboard()
         .url("Перейти до користувача", `https://t.me/${ctx.me.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`),
       textOptions: {
