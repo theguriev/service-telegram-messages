@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import mongoose, { Schema } from "mongoose";
 import { adminId, regularId } from "./constants";
 
 export const adminUserSeedData = {
@@ -25,13 +26,31 @@ export const regularUserSeedData = {
   role: "user",
   meta: {
     managerId: adminUserSeedData.id, // Link to admin user
+    firstName: "RegularSeedFirstName",
+    lastName: "RegularSeedLastName",
+    contraindications: "Test",
+    eatingDisorder: "Test",
+    spineIssues: "Test",
+    endocrineDisorders: "Test",
+    physicalActivity: "Test",
+    foodIntolerances: "Test",
   },
 };
 
+export const measurementSeedData = {
+  _id: new ObjectId(),
+  userId: regularUserSeedData._id.toString(),
+  timestamp: new Date().getTime(),
+  type: "steps",
+  meta: {
+    value: 10000,
+  }
+};
 
 export async function clearTestData() {
   try {
     await ModelUser.deleteMany({});
+    await mongoose.model("Measuerements", new Schema({}, { strict: false })).deleteMany({});
     console.log(
       "\x1b[32m%s\x1b[0m",
       "✓",
@@ -46,6 +65,7 @@ export async function clearTestData() {
 export async function seedTestData() {
   try {
     await ModelUser.create([adminUserSeedData, regularUserSeedData]);
+    await mongoose.model("Measurements", new Schema({}, { strict: false })).create([measurementSeedData]);
     console.log("\x1b[32m%s\x1b[0m", "✓", "Test database seeded successfully.");
   } catch (error) {
     console.error("Error seeding test database:", error);

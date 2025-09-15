@@ -4,17 +4,19 @@ import { Bot } from "grammy";
 let bot: Bot;
 
 export const configureTelegram = (token: string, config: (bot: Bot) => unknown) => {
-  bot = new Bot(token);
+  if (process.env.VITEST !== "true") {
+    bot = new Bot(token);
 
-  bot.api.config.use(
-    autoRetry({
-      maxRetryAttempts: 5,
-    })
-  );
+    bot.api.config.use(
+      autoRetry({
+        maxRetryAttempts: 5,
+      })
+    );
 
-  config(bot);
+    config(bot);
 
-  bot.start();
+    bot.start();
+  }
 };
 
 export const useTelegram = () => {

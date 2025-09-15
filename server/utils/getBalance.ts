@@ -1,6 +1,10 @@
 import type { Types } from "mongoose";
 
 const getBalance = async (base: string, userId: Types.ObjectId | string) => {
+  if (process.env.VITEST === "true") {
+    return 0;
+  }
+
   const { balance } = await $fetch<{ balance: number }>(`/private/balance/${userId}`, {
     retry: 5,
     retryDelay: 1000,

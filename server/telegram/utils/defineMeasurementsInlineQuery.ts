@@ -114,8 +114,6 @@ const valueIndicators: {
   ];
 
 const getText = async (date: Date, user: MeasurementsUser) => {
-  console.log(user);
-  const { measurements } = user;
   const startDate = resolveStartDate(date);
   const endDate = addDays(startDate, 1);
 
