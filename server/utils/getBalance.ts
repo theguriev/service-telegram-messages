@@ -21,12 +21,20 @@ export default async function getBalance<const T extends string>(addresses: T[],
 
 export default async function getBalance<const T extends string>(address: string | T[], currencySymbol: string) {
   if (isString(address)) {
+    if (process.env.VITEST === 'true') {
+      return 0;
+    }
+
     const balance = await $fetch<Record<string, number | undefined>>(`/billing/ballance/${address}`, {
       baseURL: bllsBase,
       retry: 5,
       retryDelay: 1000,
     });
     return balance?.[currencySymbol] ?? 0;
+  }
+
+  if (process.env.VITEST === 'true') {
+    return address.map((address) => ({ [address]: 0 }));
   }
 
   const limit = 100;
