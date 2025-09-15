@@ -1,8 +1,8 @@
 import { addDays } from "date-fns";
 import { InlineKeyboard } from "grammy";
 
-type ManagedQueryParams<TWord extends string> = Parameters<typeof defineManagedInlineQuery<TWord, ReportUser>>[0];
-type ReportQueryParams<TWord extends string> = Omit<ManagedQueryParams<TWord>, 'selfArticle' | 'managedArticle' | 'customPipeline'> & {
+type ManagedQueryParams<TWord extends string> = Parameters<typeof defineManagedInlineQuery<TWord, ReportUser & { balance: number }>>[0];
+type ReportQueryParams<TWord extends string> = Omit<ManagedQueryParams<TWord>, 'selfArticle' | 'managedArticle' | 'customPipeline' | 'mutateUsers'> & {
   date: () => Date;
   selfArticle: Omit<ManagedQueryParams<TWord>['selfArticle'], 'text' | 'textOptions' | 'reply_markup'>;
   managedArticle: Omit<ManagedQueryParams<TWord>['managedArticle'], 'text' | 'textOptions' | 'reply_markup'>;
@@ -177,6 +177,13 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
         },
       ];
     },
+    mutateUsers: async (users, { config: { currencySymbol } }) => {
+      const balances = await getBalance(users.map(user => user.address), currencySymbol);
+      return users.map(user => ({
+        ...user,
+        balance: balances[user.address]
+      }));
+    }
   });
 
 export default defineReportInlineQuery;

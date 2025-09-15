@@ -63,6 +63,10 @@ type ManagedInlineQueryParams<T extends string, R extends User> = {
     | ((
         ctx: InlineQueryResultParams,
       ) => CustomPipeline | Promise<CustomPipeline>);
+  mutateUsers?: (
+    users: R[],
+    ctx: InlineQueryResultParams,
+  ) => Promise<R[]> | R[];
 };
 
 const getOptions = async <T extends object, R extends User>(
@@ -96,6 +100,7 @@ const defineManagedInlineQuery = <
   managedArticle,
   searchWords,
   customPipeline = [],
+  mutateUsers
 }: ManagedInlineQueryParams<TWord, R>) => {
   const getResults: InlineQueryFunc = async (params) => {
     const { query, offset, limit, currentUser, getPhotoUrl } = params;
@@ -179,7 +184,14 @@ const defineManagedInlineQuery = <
 
     const results: InlineQueryResult[] = [];
     const managedUsers = await ModelUser.aggregate<R>(pipeline);
-    for (const aggregatedUser of managedUsers) {
+    const mutatedUsers = mutateUsers
+      ? mutateUsers(managedUsers, params)
+      : managedUsers;
+    const awaitedUsers = mutatedUsers instanceof Promise
+      ? await mutatedUsers
+      : mutatedUsers;
+
+    for (const aggregatedUser of awaitedUsers) {
       const userArticle =
         aggregatedUser._id.toString() === currentUser._id.toString()
           ? selfArticle

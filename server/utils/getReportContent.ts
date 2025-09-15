@@ -2,7 +2,7 @@ import { addDays, differenceInDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { groupBy, sumBy } from "es-toolkit";
 
-const getReportContent = async (user: ReportUser, currencySymbol: string, date: {
+const getReportContent = async (user: ReportUser & { balance: number }, currencySymbol: string, date: {
   date: Date;
   showDate?: boolean;
   timezone?: string;
@@ -83,7 +83,9 @@ const getReportContent = async (user: ReportUser, currencySymbol: string, date: 
     dateHeading +
     md`*Користувач:* [${name || "Невідомий"}](tg://user?id=${user.id})` +
     "\n" +
-    md`*Кількість днів на програмі:* ${appUsed}`;
+    md`*Кількість днів на програмі:* ${appUsed}`
+    "\n" +
+    md`*Кількість днів до завершення підписки:* ${user.balance}`;
   const nutrition =
     md`**>*_Харчування:_*` +
     "\n" +

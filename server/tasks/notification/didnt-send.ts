@@ -9,7 +9,7 @@ export default defineTask({
     description: "Sends notifications to managers with users, that didn't send reports",
   },
   async run() {
-    const { authorizationBase } = useRuntimeConfig();
+    const { currencySymbol } = useRuntimeConfig();
     const telegram = useTelegram();
 
     const yesterday = subDays(new Date(), 1);
@@ -87,7 +87,7 @@ export default defineTask({
       })[];
       const userLinksAsync = typedUsers.map(async (user) => {
         try {
-          const balance = await getBalance(authorizationBase, user._id);
+          const balance = await getBalance(user.address, currencySymbol);
           if (balance) {
             const name = [user.firstName, user.lastName].filter(Boolean).join(" ");
             const message = user.messages[0];

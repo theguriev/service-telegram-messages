@@ -170,6 +170,7 @@ export default eventHandler(async (event) => {
   if (await canSend(event)) {
     const userId = await getUserId(event);
     const user = await getReportUser(userId, timezone);
+    const balance = await getBalance(user.address, currencySymbol);
 
     if (!user) {
       throw createError({ statusCode: 404, statusMessage: "User not found with today steps" });
@@ -183,7 +184,10 @@ export default eventHandler(async (event) => {
     try {
       const telegram = useTelegram();
       const isWeekend = weekends.includes(toZonedTime(new Date(), timezone ?? "Europe/Kyiv").getDay());
-      const content = await getReportContent(user, currencySymbol, { date: new Date(), timezone });
+      const content = await getReportContent({
+        ...user,
+        balance
+      }, currencySymbol, { date: new Date(), timezone });
 
       if (!isWeekend) {
         const separator = "\n\n" + md`${"------------------------------------------------------"}` + "\n\n";
