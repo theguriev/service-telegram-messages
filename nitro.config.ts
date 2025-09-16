@@ -30,7 +30,8 @@ export default defineNitroConfig({
       { name: "parse", from: "set-cookie-parser" },
       { name: "destr", from: "destr" },
       { name: "md", from: "telegram-escape" },
-      { name: "useTelegram", from: "~/telegram" }
+      { name: "useTelegram", from: "~/telegram" },
+      { name: "useTelegramBot", from: "~/telegram" },
     ],
     presets: [
       {
