@@ -87,7 +87,7 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
     dateHeading +
     md`*Користувач:* [${name || "Невідомий"}](tg://user?id=${user.id})` +
     "\n" +
-    md`*Кількість днів на програмі:* ${appUsed}`
+    md`*Кількість днів на програмі:* ${appUsed}` +
     "\n" +
     md`*Кількість днів до завершення підписки:* ${user.balance}`;
   const nutrition =
