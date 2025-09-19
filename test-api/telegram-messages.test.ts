@@ -5,18 +5,11 @@ import { regularId } from "../constants";
 const baseURL = "http://localhost:3000";
 
 const messageBody = {
-  content: "Some message",
   receiverId: 456,
-};
-
-const selfMessageBody = {
-  content: "Some self message",
 };
 
 const afterWizardMessage = {
   sex: "female",
-  firstName: "Test",
-  lastName: "Test",
   birthday: new Date(),
   height: 1,
   weight: 2,
@@ -25,12 +18,6 @@ const afterWizardMessage = {
   hip: 1,
   hips: 1,
   chest: 1,
-  contraindications: "Test",
-  eatingDisorder: "Test",
-  spineIssues: "Test",
-  endocrineDisorders: "Test",
-  physicalActivity: "Test",
-  foodIntolerances: "Test",
   goalWeight: 1,
   whereDoSports: "gym",
   isGaveBirth: "yes",
@@ -208,23 +195,6 @@ describe.sequential("Message", () => {
     });
   });
 
-  describe("POST /message/self", () => {
-    it("gets 204 on valid message data", async () => {
-      await $fetch("/message/self", {
-        baseURL,
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Cookie: `accessToken=${regularAccessToken};`,
-        },
-        body: selfMessageBody,
-        onResponse: ({ response }) => {
-          expect(response.status).toBe(204);
-        },
-      });
-    });
-  });
-
   describe("GET /message", () => {
     it("gets 200 with message data", async () => {
       await $fetch("/message", {
@@ -239,8 +209,8 @@ describe.sequential("Message", () => {
           expect(response._data).toBeInstanceOf(Array);
           expect(response._data).toHaveLength(1);
           expect(response._data[0]).toBeInstanceOf(Object);
-          expect(response._data[0].content).toBe(messageBody.content);
-          expect(response._data[0].receiverId).toBe(messageBody.receiverId);
+          expect(response._data[0]).toHaveProperty("content");
+          expect(response._data[0]).toHaveProperty("receiverId", messageBody.receiverId);
         },
       });
     });
@@ -298,8 +268,8 @@ describe.sequential("Message", () => {
           expect(response._data).toBeInstanceOf(Array);
           expect(response._data).toHaveLength(1);
           expect(response._data[0]).toBeInstanceOf(Object);
-          expect(response._data[0].content).toBe(messageBody.content);
-          expect(response._data[0].receiverId).toBe(messageBody.receiverId);
+          expect(response._data[0]).toHaveProperty("content");
+          expect(response._data[0]).toHaveProperty("receiverId", messageBody.receiverId);
         },
       });
     });

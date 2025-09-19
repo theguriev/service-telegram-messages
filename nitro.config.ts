@@ -14,6 +14,8 @@ export default defineNitroConfig({
     appUrl: "https://domain.ngrok-free.app",
     telegramApp: "nauka",
     currencySymbol: "nka",
+    restartTelegram: "false",
+    restartTelegramInterval: "5000",
   },
   experimental: {
     tasks: true,

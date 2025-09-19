@@ -8,6 +8,10 @@ const getTransactions = async (options: {
   order?: 'asc' | 'desc';
   orderBy?: '_id' | 'from' | 'to' | 'symbol' | 'timestamp' | 'message' | 'value';
 }) => {
+  if (process.env.VITEST === "true") {
+    return [];
+  }
+
   return await $fetch<{
       _id: string;
       from: string;

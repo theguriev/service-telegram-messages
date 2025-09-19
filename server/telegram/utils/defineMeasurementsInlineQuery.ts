@@ -14,7 +14,7 @@ interface MeasurementsUser extends User {
 };
 
 type ManagedQueryParams<TWord extends string> = Parameters<typeof defineManagedInlineQuery<TWord, MeasurementsUser>>[0];
-type MeasurementQueryParams<TWord extends string> = Omit<ManagedQueryParams<TWord>, 'selfArticle' | 'managedArticle' | 'customPipeline'> & {
+type MeasurementQueryParams<TWord extends string> = Omit<ManagedQueryParams<TWord>, 'selfArticle' | 'managedArticle' | 'customPipeline' | 'mutateUsers'> & {
   date: () => Date;
   selfArticle: Omit<ManagedQueryParams<TWord>['selfArticle'], 'text' | 'textOptions' | 'reply_markup'>;
   managedArticle: Omit<ManagedQueryParams<TWord>['managedArticle'], 'text' | 'textOptions' | 'reply_markup'>;
@@ -114,8 +114,6 @@ const valueIndicators: {
   ];
 
 const getText = async (date: Date, user: MeasurementsUser) => {
-  console.log(user);
-  const { measurements } = user;
   const startDate = resolveStartDate(date);
   const endDate = addDays(startDate, 1);
 

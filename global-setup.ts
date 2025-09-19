@@ -52,6 +52,8 @@ const ctx: Context = {
     NITRO_APP_URL: "https://domain.ngrok-free.app",
     NITRO_TELEGRAM_APP: "nauka",
     NITRO_CURRENCY_SYMBOL: "nka",
+    NITRO_RESTART_TELEGRAM: "false",
+    NITRO_RESTART_TELEGRAM_INTERVAL: "5000",
     CUSTOM_HELLO_THERE: "general",
     SECRET: "gurievcreative",
     VALID_ADMIN_ACCESS_TOKEN: issueAccessToken(
