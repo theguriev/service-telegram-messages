@@ -7,6 +7,7 @@ export default defineNitroPlugin(async (nitro) => {
   const config = useRuntimeConfig();
   const { botToken, appUrl, restartTelegram, restartTelegramInterval } = config;
   console.info('🚚 Configuring telegram...', botToken);
+  console.log(restartTelegram, typeof restartTelegram, restartTelegramInterval, typeof restartTelegramInterval);
   await startTelegram(botToken, async (bot) => {
     bot.on("inline_query", async (ctx) => {
       try {
@@ -79,7 +80,7 @@ export default defineNitroPlugin(async (nitro) => {
 
     console.info('Telegram successfully configured 🚀', botToken);
   }, {
-    restart: restartTelegram === "true",
-    restartInterval: restartTelegramInterval ? parseInt(restartTelegramInterval) : undefined,
+    restart: typeof restartTelegram === 'string' ? restartTelegram === 'true' : restartTelegram,
+    restartInterval: restartTelegramInterval ? Number(restartTelegramInterval) : undefined,
   });
 })
