@@ -126,6 +126,9 @@ const getReportUser = async (id: string, timezone: string = "Europe/Kyiv") => {
             $sort: {
               createdAt: 1
             }
+          },
+          {
+            $limit: 1
           }
         ],
         as: "messages"
@@ -187,7 +190,7 @@ export default eventHandler(async (event) => {
       const content = await getReportContent({
         ...user,
         balance
-      }, currencySymbol, { date: new Date(), timezone });
+      }, { date: new Date(), timezone });
 
       if (!isWeekend) {
         const separator = "\n\n" + md`${"------------------------------------------------------"}` + "\n\n";

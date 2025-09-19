@@ -1,12 +1,13 @@
+import { GrammyError, HttpError } from "grammy";
 import { InlineQueryResult } from "grammy/types";
 import inlineQueries from '~/telegram/inlineQueries';
-import { configureTelegram } from "../telegram";
+import { startTelegram } from "../telegram";
 
 export default defineNitroPlugin(async (nitro) => {
   const config = useRuntimeConfig();
-  const { botToken, appUrl } = config;
+  const { botToken, appUrl, restartTelegram, restartTelegramInterval } = config;
   console.info('🚚 Configuring telegram...', botToken);
-  configureTelegram(botToken, async (bot) => {
+  await startTelegram(botToken, async (bot) => {
     bot.on("inline_query", async (ctx) => {
       try {
         const [offsetStep, offset] = (ctx.inlineQuery.offset || '0:0')
@@ -63,6 +64,21 @@ export default defineNitroPlugin(async (nitro) => {
         console.error('Error occurred in telegram inline query:', error);
       }
     });
+
+    bot.catch(({ error, ctx }) => {
+      console.error(`Error while handling Telegram update ${ctx.update.update_id}:`);
+      if (error instanceof GrammyError) {
+        console.error("Error in Telegram request:", error.description);
+      } else if (error instanceof HttpError) {
+        console.error("Could not contact Telegram:", error);
+      } else {
+        console.error("Unknown Telegram error:", error);
+      }
+    });
+
+    console.info('Telegram successfully configured 🚀', botToken);
+  }, {
+    restart: restartTelegram === "true",
+    restartInterval: restartTelegramInterval ? parseInt(restartTelegramInterval) : undefined,
   });
-  console.info('Telegram successfully configured 🚀', botToken);
 })

@@ -13,7 +13,7 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
     ...params,
     selfArticle: {
       ...params.selfArticle,
-      text: (user, { config: { currencySymbol } }) => getReportContent(user, currencySymbol, { date: params.date(), showDate: true }),
+      text: (user) => getReportContent(user, { date: params.date(), showDate: true }),
       reply_markup: (user, { ctx, config: { telegramApp } }) => new InlineKeyboard()
         .url("Перейти до користувача", `https://t.me/${ctx.me.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`),
       textOptions: {
@@ -22,7 +22,7 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
     },
     managedArticle: {
       ...params.managedArticle,
-      text: (user, { config: { currencySymbol } }) => getReportContent(user, currencySymbol, { date: params.date(), showDate: true }),
+      text: (user) => getReportContent(user, { date: params.date(), showDate: true }),
       reply_markup: (user, { ctx, config: { telegramApp } }) => new InlineKeyboard()
         .url("Перейти до користувача", `https://t.me/${ctx.me.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`),
       textOptions: {
@@ -141,6 +141,9 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
                 $sort: {
                   createdAt: 1
                 }
+              },
+              {
+                $limit: 1
               }
             ],
             as: "messages"

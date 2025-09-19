@@ -1,27 +1,31 @@
-import { addDays, differenceInDays } from "date-fns";
+import { differenceInDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { groupBy, sumBy } from "es-toolkit";
 
-const getReportContent = async (user: ReportUser & { balance: number }, currencySymbol: string, date: {
+const getReportContent = async (user: ReportUser & { balance: number }, date: {
   date: Date;
   showDate?: boolean;
   timezone?: string;
 }) => {
   const { notes, sets, measurements } = user;
-  const startDate = resolveStartDate(date.date, date.timezone ?? "Europe/Kyiv");
-  const endDate = addDays(startDate, 1);
+  const utcStartDate = resolveStartDate(date.date, "Etc/UTC", true);
   const set: typeof sets[number] | undefined = sets[0];
   const exercise = measurements.find((measurement) => measurement.type === "exercise");
   const steps = measurements.find((measurement) => measurement.type === "steps").meta?.value;
   const goal = user.meta?.stepsGoal ?? 7000;
 
-  const transaction = await getAllTransactions({
-    symbol: currencySymbol,
-    order: 'desc',
-  }, (transaction) => transaction.to === user.address);
-  const message = transaction ? user.messages.find(message => message.createdAt.getTime() >= transaction.timestamp) : undefined;
-  const appUsed = message
-    ? differenceInDays(startDate, resolveStartDate(message.createdAt))
+  const message = user.messages[0];
+
+  const programStartDate = user.meta?.programStart
+    ? new Date(user.meta.programStart)
+    : message
+      ? resolveStartDate(message.createdAt, "Etc/UTC", true)
+      : undefined;
+  const appUsed = programStartDate
+    ? differenceInDays(
+        utcStartDate,
+        programStartDate,
+      ) + 1
     : 1;
 
   const createSelector =
