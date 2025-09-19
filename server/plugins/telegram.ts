@@ -59,6 +59,7 @@ export default defineNitroPlugin(async (nitro) => {
 
         await ctx.answerInlineQuery(results, {
           next_offset: newOffset.join(":"),
+          cache_time: 0
         });
       } catch (error) {
         console.error('Error occurred in telegram inline query:', error);
