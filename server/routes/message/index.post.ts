@@ -167,7 +167,7 @@ const getReportUser = async (id: string, timezone: string = "Europe/Kyiv") => {
 };
 
 export default eventHandler(async (event) => {
-  const { currencySymbol } = useRuntimeConfig();
+  const { currencySymbol, telegramApp } = useRuntimeConfig();
   const { receiverId, timezone } = await zodValidateBody(event, requestBodySchema.parse);
 
   if (await canSend(event)) {
@@ -185,7 +185,7 @@ export default eventHandler(async (event) => {
     }).sort({ createdAt: 1 });
 
     try {
-      const telegram = useTelegram();
+      const telegram = useTelegramBot();
       const isWeekend = weekends.includes(toZonedTime(new Date(), timezone ?? "Europe/Kyiv").getDay());
       const content = await getReportContent({
         ...user,
@@ -206,24 +206,79 @@ export default eventHandler(async (event) => {
             content
           : content;
 
-        await telegram.sendMessage(receiverId, fullContent, {
-          parse_mode: "MarkdownV2",
-          reply_markup: new InlineKeyboard()
-            .url("Показати користувача", `tg://user?id=${user.id}`)
-            .url("Написати користувачеві", `tg://openmessage?user_id=${user.id}`)
-        });
+        const sendMessageToReceiver = async (withoutUserProfile: boolean = false, withoutUserMessages: boolean = false) => {
+          let inlineKeyboard = new InlineKeyboard();
+
+          if (!withoutUserProfile) {
+            inlineKeyboard.url("Показати користувача", `tg://user?id=${user.id}`);
+          }
+          if (!withoutUserMessages) {
+            inlineKeyboard.url("Написати користувачеві", `tg://openmessage?user_id=${user.id}`);
+          }
+
+          inlineKeyboard.row().url(
+            "Перейти до профілю в додатку",
+            `https://t.me/${telegram.botInfo.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`
+          );
+
+          await telegram.api.sendMessage(receiverId, fullContent, {
+            parse_mode: "MarkdownV2",
+            reply_markup: inlineKeyboard
+          });
+        };
+
+        const messageErrors = [
+          `Can't send message with user profile for user ${user._id} to ${receiverId}`,
+          `Can't send message with user messages for user ${user._id} to ${receiverId}`,
+          `Can't send message for user ${user._id} to ${receiverId}`
+        ]
+        for (let i = 0; i < messageErrors.length; i++) {
+          try {
+            await sendMessageToReceiver(i > 0, i > 1);
+            break;
+          } catch (error) {
+            console.error(messageErrors[i], error);
+            if (i === messageErrors.length - 1) {
+              throw error;
+            }
+          }
+        }
 
         await ModelMessage.updateMany(
           { _id: { $in: previousMessages.map((message) => message._id) } },
           { $set: { didntSend: false } }
         );
       }
-      await telegram.sendMessage(user.id, content, {
-        parse_mode: "MarkdownV2",
-        reply_markup: new InlineKeyboard()
-          .url("Показати отримувача", `tg://user?id=${receiverId}`)
-          .url("Написати отримувачеві", `tg://openmessage?user_id=${receiverId}`)
-      });
+
+      const sendMessageToSender = async (withoutUserProfile: boolean = false, withoutUserMessages: boolean = false) => {
+        let inlineKeyboard = new InlineKeyboard();
+
+        if (!withoutUserProfile) {
+          inlineKeyboard.url("Показати отримувача", `tg://user?id=${receiverId}`);
+        }
+        if (!withoutUserMessages) {
+          inlineKeyboard.url("Написати отримувачеві", `tg://openmessage?user_id=${receiverId}`);
+        }
+
+        await telegram.api.sendMessage(user.id, content, {
+          parse_mode: "MarkdownV2",
+          reply_markup: inlineKeyboard
+        });
+      };
+
+      const messageErrors = [
+        `Can't send message with user profile for user ${receiverId} to ${user._id}`,
+        `Can't send message with user messages for user ${receiverId} to ${user._id}`,
+        `Can't send message for user ${receiverId} to ${user._id}`
+      ]
+      for (let i = 0; i < messageErrors.length; i++) {
+        try {
+          await sendMessageToSender(i > 0, i > 1);
+          break;
+        } catch (error) {
+          console.error(messageErrors[i], error);
+        }
+      }
 
       const message = await ModelMessage.create({
         userId: user._id,
