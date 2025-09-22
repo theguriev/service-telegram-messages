@@ -2,8 +2,6 @@ import { InlineKeyboard } from "grammy";
 
 const requestBodySchema = z.object({
   sex: z.enum(["male", "female"]),
-  firstName: z.string().min(3).max(20),
-  lastName: z.string().min(3).max(20),
   birthday: z.coerce.date(),
   height: z.number(),
   weight: z.number(),
@@ -12,12 +10,6 @@ const requestBodySchema = z.object({
   hip: z.number(),
   hips: z.number(),
   chest: z.number(),
-  contraindications: z.string().nonempty().nullish(),
-  eatingDisorder: z.string().nonempty().nullish(),
-  spineIssues: z.string().nonempty().nullish(),
-  endocrineDisorders: z.string().nonempty().nullish(),
-  physicalActivity: z.string(),
-  foodIntolerances: z.string().nonempty().nullish(),
   goalWeight: z.number().min(1),
   whereDoSports: z.enum(["gym", "home"]),
   isGaveBirth: z.enum(["no", "yes"]).nullish(),
@@ -26,11 +18,31 @@ const requestBodySchema = z.object({
   receiverId: z.number(),
 });
 
+const userMetaSchema = z.object({
+  firstName: z.string().min(3).max(20),
+  lastName: z.string().min(3).max(20),
+  contraindications: z.string().nonempty().nullish(),
+  eatingDisorder: z.string().nonempty().nullish(),
+  spineIssues: z.string().nonempty().nullish(),
+  endocrineDisorders: z.string().nonempty().nullish(),
+  physicalActivity: z.string(),
+  foodIntolerances: z.string().nonempty().nullish(),
+});
+
 export default eventHandler(async (event) => {
     const { telegramApp } = useRuntimeConfig();
   const user = await getUser(event);
 
-  const { receiverId, ...validated } = await zodValidateBody(event, requestBodySchema.parse);
+  const userMeta = user.toObject({ flattenMaps: true }).meta;
+
+  const validatedMeta = await zodValidateData(userMeta, userMetaSchema.parse);
+
+  const { receiverId, ...validatedBody } = await zodValidateBody(event, requestBodySchema.parse);
+
+  const validated = {
+    ...validatedMeta,
+    ...validatedBody,
+  };
 
   if (!user.meta?.get("wizardMessageSent")) {
     try {

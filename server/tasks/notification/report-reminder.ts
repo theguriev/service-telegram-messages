@@ -1,5 +1,4 @@
 import { startOfDay } from "date-fns";
-import getBalance from "~/utils/getBalance";
 
 export default defineTask({
   meta: {
@@ -7,7 +6,7 @@ export default defineTask({
     description: "Sends reminders to users, that didn't send report today",
   },
   async run() {
-    const { authorizationBase } = useRuntimeConfig();
+    const { currencySymbol } = useRuntimeConfig();
     const telegram = useTelegram();
 
     const startOfToday = startOfDay(new Date());
@@ -48,9 +47,9 @@ export default defineTask({
       },
     ]);
 
-    for (const { _id, id } of result) {
+    for (const { _id, id, address } of result) {
       try {
-        const balance = await getBalance(authorizationBase, _id);
+        const balance = await getBalance(address, currencySymbol);
         if (balance) {
           const message = md`*Нагадування про звіт* \- Нагадуємо вам про щоденний звіт наставнику\. Просимо зайти в додаток, заповнити необхідну інформацію, та надіслати звіт\.`
 
