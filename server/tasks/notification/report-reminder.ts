@@ -1,5 +1,4 @@
 import { startOfDay } from "date-fns";
-import getBalance from "~/utils/getBalance";
 
 export default defineTask({
   meta: {
