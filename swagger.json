@@ -173,56 +173,6 @@
         }
       }
     },
-    "/message/self": {
-      "post": {
-        "summary": "Sends message to authorized user",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SelfMessageRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "204": {
-            "description": "Message sucessfully sent"
-          },
-          "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/message/can-send": {
       "get": {
         "summary": "Check if user can send message",
@@ -572,28 +522,16 @@
       "MessageRequest": {
         "type": "object",
         "properties": {
-          "content": {
-            "type": "string",
-            "description": "Message content in markdownV2 format",
-            "example": "Hello, this is a test message"
-          },
           "receiverId": {
             "type": "number",
             "example": 379669527
-          }
-        },
-        "required": ["content", "receiverId"]
-      },
-      "SelfMessageRequest": {
-        "type": "object",
-        "properties": {
-          "content": {
+          },
+          "timezone": {
             "type": "string",
-            "description": "Message content in markdownV2 format",
-            "example": "Hello, this is a test message"
+            "example": "Europe/Kyiv"
           }
         },
-        "required": ["content"]
+        "required": ["receiverId"]
       },
       "MessageAfterWizardRequest": {
         "type": "object",
@@ -603,20 +541,6 @@
             "enum": ["male", "female"],
             "description": "The user's gender",
             "example": "male"
-          },
-          "firstName": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 20,
-            "description": "The user's first name",
-            "example": "John"
-          },
-          "lastName": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 20,
-            "description": "The user's last name",
-            "example": "Doe"
           },
           "birthday": {
             "type": "string",
@@ -658,41 +582,6 @@
             "type": "number",
             "description": "The user's chest circumference in centimeters",
             "example": 90
-          },
-          "contraindications": {
-            "type": "string",
-            "nullable": true,
-            "description": "Medical contraindications for exercises",
-            "example": "Hypertension"
-          },
-          "eatingDisorder": {
-            "type": "string",
-            "nullable": true,
-            "description": "Eating disorders or dietary habits",
-            "example": "Overeating issues"
-          },
-          "spineIssues": {
-            "type": "string",
-            "nullable": true,
-            "description": "Spine, knee, kidney, or other health issues",
-            "example": "Scoliosis"
-          },
-          "endocrineDisorders": {
-            "type": "string",
-            "nullable": true,
-            "description": "Endocrine disorders",
-            "example": "Diabetes"
-          },
-          "physicalActivity": {
-            "type": "string",
-            "description": "Physical activity level over the past year",
-            "example": "Regular gym workouts"
-          },
-          "foodIntolerances": {
-            "type": "string",
-            "nullable": true,
-            "description": "Food intolerances",
-            "example": "Lactose intolerance"
           },
           "goalWeight": {
             "type": "number",

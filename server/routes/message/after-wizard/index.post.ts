@@ -2,8 +2,6 @@ import { InlineKeyboard } from "grammy";
 
 const requestBodySchema = z.object({
   sex: z.enum(["male", "female"]),
-  firstName: z.string().min(3).max(20),
-  lastName: z.string().min(3).max(20),
   birthday: z.coerce.date(),
   height: z.number(),
   weight: z.number(),
@@ -12,12 +10,6 @@ const requestBodySchema = z.object({
   hip: z.number(),
   hips: z.number(),
   chest: z.number(),
-  contraindications: z.string().nonempty().nullish(),
-  eatingDisorder: z.string().nonempty().nullish(),
-  spineIssues: z.string().nonempty().nullish(),
-  endocrineDisorders: z.string().nonempty().nullish(),
-  physicalActivity: z.string(),
-  foodIntolerances: z.string().nonempty().nullish(),
   goalWeight: z.number().min(1),
   whereDoSports: z.enum(["gym", "home"]),
   isGaveBirth: z.enum(["no", "yes"]).nullish(),
@@ -26,14 +18,35 @@ const requestBodySchema = z.object({
   receiverId: z.number(),
 });
 
+const userMetaSchema = z.object({
+  firstName: z.string().min(3).max(20),
+  lastName: z.string().min(3).max(20),
+  contraindications: z.string().nonempty().nullish(),
+  eatingDisorder: z.string().nonempty().nullish(),
+  spineIssues: z.string().nonempty().nullish(),
+  endocrineDisorders: z.string().nonempty().nullish(),
+  physicalActivity: z.string(),
+  foodIntolerances: z.string().nonempty().nullish(),
+});
+
 export default eventHandler(async (event) => {
+    const { telegramApp } = useRuntimeConfig();
   const user = await getUser(event);
 
-  const { receiverId, ...validated } = await zodValidateBody(event, requestBodySchema.parse);
+  const userMeta = user.toObject({ flattenMaps: true }).meta;
+
+  const validatedMeta = await zodValidateData(userMeta, userMetaSchema.parse);
+
+  const { receiverId, ...validatedBody } = await zodValidateBody(event, requestBodySchema.parse);
+
+  const validated = {
+    ...validatedMeta,
+    ...validatedBody,
+  };
 
   if (!user.meta?.get("wizardMessageSent")) {
     try {
-      const telegram = useTelegram();
+      const telegram = useTelegramBot();
 
       const fields: {
         [K in keyof typeof validated]: {
@@ -134,12 +147,43 @@ export default eventHandler(async (event) => {
         "\n\n" +
         fieldMessages.join("\n");
 
-      await telegram.sendMessage(receiverId, content, {
-        parse_mode: "MarkdownV2",
-        reply_markup: new InlineKeyboard()
-          .url("Показати користувача", `tg://user?id=${user.id}`)
-          .url("Написати користувачеві", `tg://openmessage?user_id=${user.id}`)
-      });
+      const sendMessageToReceiver = async (withoutUserProfile: boolean = false, withoutUserMessages: boolean = false) => {
+        let inlineKeyboard = new InlineKeyboard();
+
+        if (!withoutUserProfile) {
+          inlineKeyboard.url("Показати користувача", `tg://user?id=${user.id}`);
+        }
+        if (!withoutUserMessages) {
+          inlineKeyboard.url("Написати користувачеві", `tg://openmessage?user_id=${user.id}`);
+        }
+
+        inlineKeyboard.row().url(
+          "Перейти до профілю в додатку",
+          `https://t.me/${telegram.botInfo.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`
+        );
+
+        await telegram.api.sendMessage(receiverId, content, {
+          parse_mode: "MarkdownV2",
+          reply_markup: inlineKeyboard
+        });
+      };
+
+      const messageErrors = [
+        `Can't send message with user profile for user ${user._id} to ${receiverId}`,
+        `Can't send message with user messages for user ${user._id} to ${receiverId}`,
+        `Can't send message for user ${user._id} to ${receiverId}`
+      ]
+      for (let i = 0; i < messageErrors.length; i++) {
+        try {
+          await sendMessageToReceiver(i > 0, i > 1);
+          break;
+        } catch (error) {
+          console.error(messageErrors[i], error);
+          if (i === messageErrors.length - 1) {
+            throw error;
+          }
+        }
+      }
 
       if (!user.meta) {
         user.meta = new Map();

@@ -1,12 +1,17 @@
 import { bllsBase } from "~~/constants";
 
 const getTransactions = async (options: {
+  symbol: string;
   address?: string;
   limit?: number;
   offset?: number;
   order?: 'asc' | 'desc';
   orderBy?: '_id' | 'from' | 'to' | 'symbol' | 'timestamp' | 'message' | 'value';
-} = {}) => {
+}) => {
+  if (process.env.VITEST === "true") {
+    return [];
+  }
+
   return await $fetch<{
       _id: string;
       from: string;
@@ -18,7 +23,6 @@ const getTransactions = async (options: {
     }[]>(`/billing/transactions`, {
       baseURL: bllsBase,
       query: {
-        symbol: 'nka',
         ...options,
       },
       retry: 5,

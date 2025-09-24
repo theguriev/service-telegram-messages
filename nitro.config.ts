@@ -12,6 +12,10 @@ export default defineNitroConfig({
     secret: "gurievcreative",
     authorizationBase: "http://localhost:4000",
     appUrl: "https://domain.ngrok-free.app",
+    telegramApp: "nauka",
+    currencySymbol: "nka",
+    restartTelegram: "false",
+    restartTelegramInterval: "5000",
   },
   experimental: {
     tasks: true,
@@ -32,6 +36,7 @@ export default defineNitroConfig({
       { name: "useTelegram", from: "~/telegram" },
       { name: "can", from: "~/permission" },
       { name: "matchCan", from: "~/permission" },
+      { name: "useTelegramBot", from: "~/telegram" },
     ],
     presets: [
       {

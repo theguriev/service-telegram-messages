@@ -1,6 +1,5 @@
 type Transaction = Awaited<ReturnType<typeof getTransactions>>[number];
 
-export default async function getAllTransactions(): Promise<Transaction[]>;
 export default async function getAllTransactions(
   options: Omit<Parameters<typeof getTransactions>[0], "offset" | "limit">
 ): Promise<Transaction[]>;
@@ -10,7 +9,7 @@ export default async function getAllTransactions(
 ): Promise<Transaction | undefined>;
 
 export default async function getAllTransactions(
-  options: Omit<Parameters<typeof getTransactions>[0], "offset" | "limit"> = {},
+  options: Omit<Parameters<typeof getTransactions>[0], "offset" | "limit">,
   predicate?: (transaction: Transaction, index: number) => boolean
 ): Promise<undefined | Transaction | Transaction[]> {
   const step = 1000;

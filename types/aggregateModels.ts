@@ -54,3 +54,16 @@ export interface Note {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export interface ReportUser extends User {
+  measurements: Measurement[];
+  sets: (Omit<Set, 'ingredients'> & {
+    ingredients: (ArrayType<Set["ingredients"]> & {
+      ingredient: Ingredient & {
+        category: Category;
+      }
+    })[]
+  })[];
+  messages: Message[];
+  notes: Note[];
+};

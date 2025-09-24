@@ -12,6 +12,7 @@ export const imports: Parameters<typeof Unimport.vite>[0]["imports"] = [
   { name: "useTelegram", from: "~/telegram" },
   { name: "can", from: "~/permission" },
   { name: "matchCan", from: "~/permission" },
+  { name: "useTelegramBot", from: "~/telegram" },
 ];
 
 export const adminId = "6808bcfb77143eceb802c5a7";
