@@ -132,34 +132,35 @@ const defineManagedInlineQuery = <
       customPipelineResult instanceof Promise
         ? await customPipelineResult
         : customPipelineResult;
+
+    const match = [
+      ...(!can(currentUser, "show-all-users-in-inline-queries") ? [{
+        $or: [
+          { _id: currentUser._id },
+          ...(can(currentUser, "show-managed-users-in-inline-queries")
+            ? [{ "meta.managerId": currentUser.id }]
+            : []),
+        ],
+      }] : []),
+      ...(user
+        ? [
+          {
+            $or: [
+              regexExpression("_id"),
+              regexExpression("id"),
+              regexExpression("firstName"),
+              regexExpression("lastName"),
+              regexExpression("username"),
+              regexExpression("meta.firstName"),
+              regexExpression("meta.lastName"),
+            ],
+          },
+        ]
+        : []),
+    ];
+
     const pipeline: PipelineStage[] = [
-      {
-        $match: {
-          $and: [
-            {
-              $or: [
-                { _id: currentUser._id },
-                { "meta.managerId": currentUser.id },
-              ],
-            },
-            ...(user
-              ? [
-                  {
-                    $or: [
-                      regexExpression("_id"),
-                      regexExpression("id"),
-                      regexExpression("firstName"),
-                      regexExpression("lastName"),
-                      regexExpression("username"),
-                      regexExpression("meta.firstName"),
-                      regexExpression("meta.lastName"),
-                    ],
-                  },
-                ]
-              : []),
-          ],
-        },
-      },
+      ...(match.length > 0 ? [{ $match: { $and: match } }] : []),
       {
         $addFields: {
           isCurrentUser: {
