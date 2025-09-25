@@ -361,111 +361,6 @@
         }
       }
     },
-    "/message/measurements/can-send": {
-      "get": {
-        "summary": "Check if measurements can be sent",
-        "parameters": [
-          {
-            "name": "weight",
-            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^[a-fA-F0-9]{24}$",
-              "description": "ObjectId of the weight measurement"
-            }
-          },
-          {
-            "name": "waist",
-            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^[a-fA-F0-9]{24}$",
-              "description": "ObjectId of the waist measurement"
-            }
-          },
-          {
-            "name": "shoulder",
-            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^[a-fA-F0-9]{24}$",
-              "description": "ObjectId of the shoulder measurement"
-            }
-          },
-          {
-            "name": "hip",
-            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^[a-fA-F0-9]{24}$",
-              "description": "ObjectId of the hip measurement"
-            }
-          },
-          {
-            "name": "hips",
-            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^[a-fA-F0-9]{24}$",
-              "description": "ObjectId of the hips measurement"
-            }
-          },
-          {
-            "name": "chest",
-            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^[a-fA-F0-9]{24}$",
-              "description": "ObjectId of the chest measurement"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CanSendResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/message/user-photo/{userId}": {
       "get": {
         "summary": "Get user photo",
@@ -727,12 +622,6 @@
       "Measurement": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "description": "ObjectId of the measurement",
-            "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
-            "pattern": "^[a-fA-F0-9]{24}$"
-          },
           "value": {
             "type": "number",
             "description": "Measurement value",
