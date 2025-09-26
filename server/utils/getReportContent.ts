@@ -74,10 +74,9 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
     ? existingNotesMessage
     : "";
 
-  let name = `${user.meta?.firstName} ${user.meta?.firstName}`.trim();
-  if (!name) {
-    name = `${user.firstName} ${user.lastName}`.trim();
-  }
+  const firstName = user.meta?.firstName?.trim() || user.firstName?.trim() || "";
+  const lastName = user.meta?.lastName?.trim() || user.lastName?.trim() || "";
+  const name = `${firstName} ${lastName}`.trim() || "Невідомий";
 
   const dateHeading = date.showDate
     ? md`*_Щоденний звіт за ${toZonedTime(date.date, date.timezone ?? "Europe/Kyiv").toLocaleDateString("uk-UA")}:_*` + "\n"
