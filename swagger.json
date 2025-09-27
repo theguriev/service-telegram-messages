@@ -200,15 +200,15 @@
         }
       }
     },
-    "/message/last-messages": {
+    "/message/first-messages": {
       "post": {
-        "summary": "Get last messages",
+        "summary": "Get first messages",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LastMessagesRequest"
+                "$ref": "#/components/schemas/FirstMessagesRequest"
               }
             }
           }
@@ -219,7 +219,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/LastMessagesResponse"
+                  "$ref": "#/components/schemas/FirstMessagesResponse"
                 }
               }
             }
@@ -485,7 +485,7 @@
         },
         "required": ["receiverId"]
       },
-      "LastMessagesRequest": {
+      "FirstMessagesRequest": {
         "type": "object",
         "properties": {
           "users": {
@@ -653,7 +653,7 @@
           "$ref": "#/components/schemas/Message"
         }
       },
-      "LastMessagesResponse": {
+      "FirstMessagesResponse": {
         "type": "array",
         "items": {
           "type": "object",

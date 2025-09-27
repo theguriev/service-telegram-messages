@@ -132,9 +132,9 @@ describe.sequential("Message", () => {
     });
   });
 
-  describe("POST /message/last-messages", async () => {
+  describe("POST /message/first-messages", async () => {
     it("gets 403 for non admin", async () => {
-      await $fetch("/message/last-messages", {
+      await $fetch("/message/first-messages", {
         baseURL,
         method: "POST",
         headers: {
@@ -150,7 +150,7 @@ describe.sequential("Message", () => {
     })
 
     it("gets 401 on authorization error", async () => {
-      await $fetch("/message/last-messages", {
+      await $fetch("/message/first-messages", {
         baseURL,
         method: "POST",
         headers: {
@@ -165,7 +165,7 @@ describe.sequential("Message", () => {
     });
 
     it("gets 400 on validation error with empty request body", async () => {
-      await $fetch("/message/last-messages", {
+      await $fetch("/message/first-messages", {
         baseURL,
         method: "POST",
         headers: {
@@ -181,7 +181,7 @@ describe.sequential("Message", () => {
     });
 
     it("gets 400 on validation error with empty users array", async () => {
-      await $fetch("/message/last-messages", {
+      await $fetch("/message/first-messages", {
         baseURL,
         method: "POST",
         headers: {
@@ -197,7 +197,7 @@ describe.sequential("Message", () => {
     });
 
     it("gets 400 on validation error with invalid user id", async () => {
-      await $fetch("/message/last-messages", {
+      await $fetch("/message/first-messages", {
         baseURL,
         method: "POST",
         headers: {
@@ -213,7 +213,7 @@ describe.sequential("Message", () => {
     });
 
     it("gets 200 with empty result", async () => {
-      await $fetch("/message/last-messages", {
+      await $fetch("/message/first-messages", {
         baseURL,
         method: "POST",
         headers: {
@@ -359,9 +359,9 @@ describe.sequential("Message", () => {
     });
   });
 
-  describe("POST /message/last-messages", () => {
+  describe("POST /message/first-messages", () => {
     it("gets 200 with message", async () => {
-      await $fetch("/message/last-messages", {
+      await $fetch("/message/first-messages", {
         baseURL,
         method: "POST",
         headers: {

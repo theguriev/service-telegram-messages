@@ -25,7 +25,7 @@ export default eventHandler(async (event) => {
       }
     },
     {
-      $sort: { userId: 1, createdAt: -1 }
+      $sort: { userId: 1, createdAt: 1 }
     },
     {
       $group: {
