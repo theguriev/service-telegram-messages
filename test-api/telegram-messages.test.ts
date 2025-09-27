@@ -132,6 +132,103 @@ describe.sequential("Message", () => {
     });
   });
 
+  describe("POST /message/first-messages", async () => {
+    it("gets 403 for non admin", async () => {
+      await $fetch("/message/first-messages", {
+        baseURL,
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${regularAccessToken};`,
+        },
+        ignoreResponseError: true,
+        body: { users: [regularId] },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(403);
+        },
+      });
+    })
+
+    it("gets 401 on authorization error", async () => {
+      await $fetch("/message/first-messages", {
+        baseURL,
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+        },
+        ignoreResponseError: true,
+        body: { users: [regularId] },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(401);
+        },
+      });
+    });
+
+    it("gets 400 on validation error with empty request body", async () => {
+      await $fetch("/message/first-messages", {
+        baseURL,
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${adminAccessToken};`,
+        },
+        ignoreResponseError: true,
+        body: {  },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(400);
+        },
+      });
+    });
+
+    it("gets 400 on validation error with empty users array", async () => {
+      await $fetch("/message/first-messages", {
+        baseURL,
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${adminAccessToken};`,
+        },
+        ignoreResponseError: true,
+        body: { users: [] },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(400);
+        },
+      });
+    });
+
+    it("gets 400 on validation error with invalid user id", async () => {
+      await $fetch("/message/first-messages", {
+        baseURL,
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${adminAccessToken};`,
+        },
+        ignoreResponseError: true,
+        body: { users: ["invalidUserId"] },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(400);
+        },
+      });
+    });
+
+    it("gets 200 with empty result", async () => {
+      await $fetch("/message/first-messages", {
+        baseURL,
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${adminAccessToken};`,
+        },
+        body: { users: [regularId] },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(200);
+          expect(response._data).toEqual([]);
+        },
+      });
+    })
+  })
+
   describe("POST /message", () => {
     it("gets 400 on validation errors", async () => {
       await $fetch("/message", {
@@ -257,6 +354,32 @@ describe.sequential("Message", () => {
           expect(response._data[0]).toBeInstanceOf(Object);
           expect(response._data[0]).toHaveProperty("content");
           expect(response._data[0]).toHaveProperty("receiverId", messageBody.receiverId);
+        },
+      });
+    });
+  });
+
+  describe("POST /message/first-messages", () => {
+    it("gets 200 with message", async () => {
+      await $fetch("/message/first-messages", {
+        baseURL,
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Cookie: `accessToken=${adminAccessToken};`,
+        },
+        body: { users: [regularId] },
+        onResponse: ({ response }) => {
+          expect(response.status).toBe(200);
+          expect(response._data).toBeInstanceOf(Array);
+          expect(response._data).toHaveLength(1);
+          expect(response._data[0]).toBeInstanceOf(Object);
+          expect(response._data[0]).toHaveProperty("userId", regularId);
+          expect(response._data[0]).toHaveProperty("message");
+          expect(response._data[0].message).toBeInstanceOf(Object);
+          expect(response._data[0].message).toHaveProperty("content");
+          expect(response._data[0].message).toHaveProperty("userId", regularId);
+          expect(response._data[0].message).toHaveProperty("receiverId", messageBody.receiverId);
         },
       });
     });
