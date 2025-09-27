@@ -200,6 +200,63 @@
         }
       }
     },
+    "/message/last-messages": {
+      "post": {
+        "summary": "Get last messages",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LastMessagesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LastMessagesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Non admin request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/message/after-wizard": {
       "post": {
         "summary": "Sends message to selected user after completing the wizard",
@@ -428,6 +485,20 @@
         },
         "required": ["receiverId"]
       },
+      "LastMessagesRequest": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": "64e0f3b2c4d5f8a1b2c4d5f8b",
+              "pattern": "^[a-fA-F0-9]{24}$"
+            }
+          }
+        },
+        "required": ["users"]
+      },
       "MessageAfterWizardRequest": {
         "type": "object",
         "properties": {
@@ -580,6 +651,23 @@
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/Message"
+        }
+      },
+      "LastMessagesResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "userId": {
+              "type": "string",
+              "description": "ID of the user who sent the message",
+              "example": "65123456789abcdef0123456"
+            },
+            "message": {
+              "$ref": "#/components/schemas/Message"
+            }
+          },
+          "required": ["userId", "message"]
         }
       },
       "MessageResponse": {
