@@ -9,6 +9,8 @@ export default defineNitroPlugin(async (nitro) => {
   console.info('🚚 Configuring telegram...', botToken);
   await startTelegram(botToken, async (bot) => {
     bot.on("inline_query", async (ctx) => {
+      const logger = await getLogger(ctx);
+
       try {
         const [offsetStep, offset] = (ctx.inlineQuery.offset || '0:0')
           .split(":")
@@ -39,7 +41,8 @@ export default defineNitroPlugin(async (nitro) => {
             currentUser,
             getPhotoUrl,
             offset: index ? 0 : offset,
-            limit: 50 - results.length
+            limit: 50 - results.length,
+            logger
           });
           let awaitedResult: InlineQueryReturnType;
           if (result instanceof Promise) {
@@ -61,8 +64,10 @@ export default defineNitroPlugin(async (nitro) => {
           next_offset: newOffset.join(":"),
           cache_time: 0
         });
+
+        await sendInlineQueryResponseLog(ctx, results, newOffset);
       } catch (error) {
-        console.error('Error occurred in telegram inline query:', error);
+        await sendInlineQueryResponseLog(ctx, error);
       }
     });
 

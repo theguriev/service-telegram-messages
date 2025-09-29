@@ -167,6 +167,7 @@ const getReportUser = async (id: string, timezone: string = "Europe/Kyiv") => {
 };
 
 export default eventHandler(async (event) => {
+  const logger = await getLogger(event);
   const { currencySymbol, telegramApp } = useRuntimeConfig();
   const { receiverId, timezone } = await zodValidateBody(event, requestBodySchema.parse);
 
@@ -237,7 +238,7 @@ export default eventHandler(async (event) => {
             await sendMessageToReceiver(i > 0, i > 1);
             break;
           } catch (error) {
-            console.error(messageErrors[i], error);
+            logger.error({ message: messageErrors[i], error });
             if (i === messageErrors.length - 1) {
               throw error;
             }
@@ -276,7 +277,7 @@ export default eventHandler(async (event) => {
           await sendMessageToSender(i > 0, i > 1);
           break;
         } catch (error) {
-          console.error(messageErrors[i], error);
+          logger.error({ message: messageErrors[i], error });
         }
       }
 
