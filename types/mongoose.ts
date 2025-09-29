@@ -1,4 +1,4 @@
-import type { Types } from "mongoose";
+import type { InferSchemaType, Types } from "mongoose";
 
 type MapConversion<T> = T extends Map<infer K, infer V>
   ? K extends string | number | symbol

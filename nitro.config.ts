@@ -30,7 +30,6 @@ export default defineNitroConfig({
     imports: [
       ...(await importsHelper("./db/model")),
       ...(await importsHelper("./db/schema", camelCase)),
-      { name: "InferSchemaType", from: "mongoose", type: true },
       { name: "parse", from: "set-cookie-parser" },
       { name: "destr", from: "destr" },
       { name: "md", from: "telegram-escape" },

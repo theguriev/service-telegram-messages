@@ -30,9 +30,9 @@ const userMetaSchema = z.object({
 });
 
 export default eventHandler(async (event) => {
-  const logger = await getLogger(event);
   const { telegramApp } = useRuntimeConfig();
   const user = await getUser(event);
+  const logger = await getLogger(event);
 
   const userMeta = user.toObject({ flattenMaps: true }).meta;
 
