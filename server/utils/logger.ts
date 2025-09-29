@@ -1,7 +1,7 @@
 import { isPlainObject } from "es-toolkit";
 import { Context, InlineQueryContext } from "grammy";
 import { InlineQueryResult } from "grammy/types";
-import { H3Error, H3Event, type HTTPHeaderName, type HTTPMethod } from "h3";
+import { H3Error, H3Event, MultiPartData, type HTTPHeaderName, type HTTPMethod } from "h3";
 import { HydratedDocument, InferSchemaType } from "mongoose";
 import util from "util";
 import { createLogger, format, transport, transports } from "winston";
@@ -170,6 +170,7 @@ const getLoggerInstance = async (
   let rawBody: string | undefined = undefined;
   let requestBody: any | undefined = undefined;
   let formData: FormData | undefined = undefined;
+  let multipartFormData: MultiPartData[] | undefined = undefined;
 
   if (event instanceof H3Event) {
     try {
@@ -188,9 +189,18 @@ const getLoggerInstance = async (
       requestBody = undefined;
     }
     try {
-      formData = await readFormData(event);
+      if (getHeader(event, "content-type").toLowerCase().includes("application/x-www-form-urlencoded")) {
+        formData = await readFormData(event);
+      }
     } catch (error) {
       formData = undefined;
+    }
+    try {
+      if (getHeader(event, "content-type").toLowerCase().includes("multipart/form-data")) {
+        multipartFormData = await readMultipartFormData(event);
+      }
+    } catch (error) {
+      multipartFormData = undefined;
     }
   }
 
@@ -263,6 +273,7 @@ const getLoggerInstance = async (
               rawBody,
               fingerprint,
               formData,
+              multipartFormData,
             },
             user,
           }
