@@ -40,6 +40,7 @@ declare module "logform" {
       rawBody?: string;
       fingerprint?: string;
       formData?: FormData;
+      multipartFormData?: MultiPartData[];
     };
     context?: InlineQueryContext<Context>;
     user?: HydratedDocument<InferSchemaType<typeof schemaUser>>;
