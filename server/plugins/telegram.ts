@@ -41,7 +41,8 @@ export default defineNitroPlugin(async (nitro) => {
             currentUser,
             getPhotoUrl,
             offset: index ? 0 : offset,
-            limit: 50 - results.length
+            limit: 50 - results.length,
+            logger
           });
           let awaitedResult: InlineQueryReturnType;
           if (result instanceof Promise) {

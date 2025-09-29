@@ -14,6 +14,7 @@ const requestBodySchema = z.object({
 });
 
 export default eventHandler(async (event) => {
+  const logger = await getLogger(event);
   const validated = await zodValidateBody(event, requestBodySchema.parse);
 
   try {
@@ -27,7 +28,7 @@ export default eventHandler(async (event) => {
       ),
     });
   } catch (error) {
-    console.error("Error sending message:", error.message);
+    logger.error({ message: "Error sending message:", error });
     throw createError({
       statusCode: 500,
       statusMessage: "Internal Server Error",
