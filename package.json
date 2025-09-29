@@ -10,11 +10,11 @@
   },
   "devDependencies": {
     "@types/big.js": "^6.2.2",
-    "@types/jsonwebtoken": "^9.0.9",
+    "@types/jsonwebtoken": "^9.0.10",
     "jscpd": "^4.0.5",
-    "mongodb-memory-server": "^10.1.3",
-    "nitropack": "latest",
-    "vitest": "^3.0.4"
+    "mongodb-memory-server": "^10.2.1",
+    "nitropack": "^2.12.6",
+    "vitest": "^3.2.4"
   },
   "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0",
   "dependencies": {
@@ -23,16 +23,18 @@
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "destr": "^2.0.5",
-    "es-toolkit": "^1.39.8",
-    "grammy": "^1.36.1",
+    "es-toolkit": "^1.39.10",
+    "grammy": "^1.38.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.9.5",
+    "mongoose": "^8.18.2",
     "plural-ru": "^2.0.2",
     "scule": "^1.3.0",
     "set-cookie-parser": "^2.7.1",
-    "sharp": "^0.34.3",
+    "sharp": "^0.34.4",
     "telegram-escape": "^1.1.1",
-    "uuid": "^11.0.5",
-    "zod": "^3.24.1"
+    "uuid": "^13.0.0",
+    "winston": "^3.17.0",
+    "winston-loki": "^6.1.3",
+    "zod": "^4.1.11"
   }
 }

@@ -16,6 +16,8 @@ export default defineNitroConfig({
     currencySymbol: "nka",
     restartTelegram: "false",
     restartTelegramInterval: "5000",
+    lokiHost: "http://localhost:3100",
+    lokiBasicAuth: undefined as string | undefined,
   },
   experimental: {
     tasks: true,
