@@ -28,46 +28,33 @@ const afterWizardMessage = {
 
 const measurementsMessage = {
   weight: {
-    id: "6808bcfb77143eceb802c5a7",
     value: 70,
     lastValue: 80,
     startValue: 90,
     goal: 60,
   },
   waist: {
-    id: "6808bcfb77143eceb802c5a8",
     value: 80,
     lastValue: 85,
     startValue: 90,
   },
   shoulder: {
-    id: "6808bcfb77143eceb802c5a9",
     value: 90,
     lastValue: 95,
     startValue: 100,
   },
   hip: {
-    id: "6808bcfb77143eceb802c5aa",
     value: 100,
   },
   hips: {
-    id: "6808bcfb77143eceb802c5ab",
     value: 110,
   },
   chest: {
-    id: "6808bcfb77143eceb802c5ac",
     value: 120,
   },
   receiverId: 123456789,
 };
 const onlyMeasurements = omit(measurementsMessage, ["receiverId"]);
-const canSendMeasurementsMessage = Object.entries(onlyMeasurements).reduce(
-  (acc, [key, { id }]) => ({
-    ...acc,
-    [key]: id,
-  }),
-  {} as Record<keyof typeof measurementsMessage, string>
-);
 
 describe.sequential("Message", () => {
   let adminAccessToken: string;
@@ -388,73 +375,6 @@ describe.sequential("Message", () => {
     });
   });
 
-  describe("GET /message/measurements/can-send", () => {
-    it("gets 401 on unauthorized access token", async () => {
-      await $fetch("/message/measurements/can-send", {
-        baseURL,
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-        ignoreResponseError: true,
-        query: canSendMeasurementsMessage,
-        onResponse: ({ response }) => {
-          expect(response.status).toBe(401);
-        },
-      });
-    });
-
-    it("gets 400 on validation errors with id", async () => {
-      await $fetch("/message/measurements/can-send", {
-        baseURL,
-        method: "GET",
-        ignoreResponseError: true,
-        headers: {
-          Accept: "application/json",
-          Cookie: `accessToken=${regularAccessToken};`,
-        },
-        query: {
-          ...canSendMeasurementsMessage,
-          hip: "invalid-id",
-        },
-        onResponse: ({ response }) => {
-          expect(response.status).toBe(400);
-        },
-      });
-    });
-
-    it("gets 400 on validation errors with empty query", async () => {
-      await $fetch("/message/measurements/can-send", {
-        baseURL,
-        method: "GET",
-        ignoreResponseError: true,
-        headers: {
-          Accept: "application/json",
-          Cookie: `accessToken=${regularAccessToken};`,
-        },
-        onResponse: ({ response }) => {
-          expect(response.status).toBe(400);
-        },
-      });
-    });
-
-    it("gets 200 with true before message sending", async () => {
-      await $fetch("/message/measurements/can-send", {
-        baseURL,
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Cookie: `accessToken=${regularAccessToken};`,
-        },
-        query: canSendMeasurementsMessage,
-        onResponse: ({ response }) => {
-          expect(response.status).toBe(200);
-          expect(response._data.canSend).toBe(true);
-        },
-      });
-    });
-  });
-
   describe("POST /message/measurements", () => {
     it("gets 401 on unauthorized access token", async () => {
       await $fetch("/message/measurements", {
@@ -467,28 +387,6 @@ describe.sequential("Message", () => {
         body: measurementsMessage,
         onResponse: ({ response }) => {
           expect(response.status).toBe(401);
-        },
-      });
-    });
-
-    it("gets 400 on validation errors with id", async () => {
-      await $fetch("/message/measurements", {
-        baseURL,
-        method: "POST",
-        ignoreResponseError: true,
-        headers: {
-          Accept: "application/json",
-          Cookie: `accessToken=${regularAccessToken};`,
-        },
-        body: {
-          ...measurementsMessage,
-          hip: {
-            ...measurementsMessage.hip,
-            id: "invalid-id",
-          },
-        },
-        onResponse: ({ response }) => {
-          expect(response.status).toBe(400);
         },
       });
     });
@@ -531,59 +429,6 @@ describe.sequential("Message", () => {
           }) => omit(value, ["_id"]))).toEqual(
             Object.entries(onlyMeasurements).map(([type, value]) => ({ ...value, type })),
           );
-        },
-      });
-    });
-
-    it("gets 403 on valid message data but already sent message with those measurements", async () => {
-      await $fetch("/message/measurements", {
-        baseURL,
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          Cookie: `accessToken=${regularAccessToken};`,
-        },
-        body: measurementsMessage,
-        ignoreResponseError: true,
-        onResponse: ({ response }) => {
-          expect(response.status).toBe(403);
-        },
-      });
-    });
-  });
-
-  describe("GET /message/measurements/can-send", () => {
-    it("gets 200 with false after message sending", async () => {
-      await $fetch("/message/measurements/can-send", {
-        baseURL,
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Cookie: `accessToken=${regularAccessToken};`,
-        },
-        query: canSendMeasurementsMessage,
-        onResponse: ({ response }) => {
-          expect(response.status).toBe(200);
-          expect(response._data.canSend).toBe(false);
-        },
-      });
-    });
-
-    it("gets 200 with true after message sending with one measurement with different id", async () => {
-      await $fetch("/message/measurements/can-send", {
-        baseURL,
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          Cookie: `accessToken=${regularAccessToken};`,
-        },
-        query: {
-          ...canSendMeasurementsMessage,
-          hip: "6808bcfb77143eceb802c5ad",
-        },
-        onResponse: ({ response }) => {
-          expect(response.status).toBe(200);
-          expect(response._data.canSend).toBe(true);
         },
       });
     });

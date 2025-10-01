@@ -9,10 +9,6 @@ const measurementMessageSchema = new Schema(
     },
     measurements: {
       type: [{
-        id: {
-          type: String,
-          required: true,
-        },
         type: {
           type: String,
           required: true,
