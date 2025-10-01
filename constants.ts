@@ -10,6 +10,8 @@ export const imports: Parameters<typeof Unimport.vite>[0]["imports"] = [
   { name: "v4", as: "uuidv4", from: "uuid" },
   { name: "parse", from: "set-cookie-parser" },
   { name: "useTelegram", from: "~/telegram" },
+  { name: "can", from: "~/permission" },
+  { name: "matchCan", from: "~/permission" },
   { name: "useTelegramBot", from: "~/telegram" },
 ];
 
