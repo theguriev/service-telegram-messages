@@ -176,6 +176,17 @@
     "/message/can-send": {
       "get": {
         "summary": "Check if user can send message",
+        "parameters": [
+          {
+            "name": "timezone",
+            "in": "query",
+            "description": "Timezone for date comparison",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful operation",
