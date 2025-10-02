@@ -6,6 +6,6 @@ export default eventHandler(async (event) => {
   const { timezone } = await zodValidateData(getQuery(event), querySchema.parse);
 
   return {
-    canSend: canSend(event, timezone)
+    canSend: await canSend(event, timezone)
   }
 });

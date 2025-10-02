@@ -28,25 +28,27 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
       ) + 1
     : 1;
 
+  const ingredients = (set?.ingredients.filter((item) => item.ingredient) ?? []) as (Omit<typeof set.ingredients[number], "ingredient"> & {
+    ingredient: NonNullable<typeof set.ingredients[number]["ingredient"]>;
+  })[];
+
   const createSelector =
-    (key: KeyByType<typeof set.ingredients[number]["ingredient"], number>) =>
+    (key: KeyByType<typeof ingredients[number]["ingredient"], number>) =>
       (
-        item: NonNullable<
-          typeof set
-        >["ingredients"][number]
+        item: typeof ingredients[number]
       ) => {
         return item.ingredient[key] * item.value;
       };
   const totalCaloriesToday = sumBy(
-    set?.ingredients ?? [],
+    ingredients,
     createSelector("calories")
   );
   const totalProteinToday = sumBy(
-    set?.ingredients ?? [],
+    ingredients,
     createSelector("proteins")
   );
 
-  const groupedSets = groupBy(set?.ingredients ?? [], (item) => item.ingredient.category.name);
+  const groupedSets = groupBy(ingredients, (item) => item.ingredient.category.name);
 
   const categoryMessages = Object.entries(groupedSets)
     .map(([category, sets]) =>
