@@ -59,7 +59,7 @@ export interface ReportUser extends User {
   measurements: Measurement[];
   sets: (Omit<Set, 'ingredients'> & {
     ingredients: (ArrayType<Set["ingredients"]> & {
-      ingredient: Ingredient & {
+      ingredient?: Ingredient & {
         category: Category;
       }
     })[]
