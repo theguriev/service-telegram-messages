@@ -170,7 +170,7 @@ export default eventHandler(async (event) => {
   const { currencySymbol, telegramApp } = useRuntimeConfig();
   const { receiverId, timezone } = await zodValidateBody(event, requestBodySchema.parse);
 
-  if (await canSend(event)) {
+  if (await canSend(event, timezone)) {
     const userId = await getUserId(event);
     const user = await getReportUser(userId, timezone);
     const balance = await getBalance(user.address, currencySymbol);
