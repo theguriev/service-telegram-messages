@@ -11,7 +11,7 @@ const requestBodySchema = z.object({
   hips: z.number(),
   chest: z.number(),
   goalWeight: z.number().min(1),
-  whereDoSports: z.enum(["gym", "home"]),
+  whereDoSports: z.enum(["gym", "home", "both"]),
   isGaveBirth: z.enum(["no", "yes"]).nullish(),
   gaveBirth: z.coerce.date().nullish(),
   breastfeeding: z.enum(["no", "yes"]).nullish(),
@@ -120,7 +120,14 @@ export default eventHandler(async (event) => {
         },
         whereDoSports: {
           name: "Де буде займатись",
-          conversion: (value) => value === "gym" ? "В залі" : "Вдома",
+          conversion: (value) => {
+            switch (value) {
+              case "gym": return "В залі";
+              case "home": return "Вдома";
+              case "both": return "Вдома та в залі";
+              default: return value;
+            }
+          },
         },
         isGaveBirth: {
           name: "Чи народжували",
