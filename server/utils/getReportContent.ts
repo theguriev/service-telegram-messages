@@ -7,9 +7,11 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
   showDate?: boolean;
   timezone?: string;
 }) => {
-  const { notes, sets, measurements } = user;
+  const { notes, sets, measurements, setsV2 } = user;
   const utcStartDate = resolveStartDate(date.date, "Etc/UTC", true);
-  const set: typeof sets[number] | undefined = sets[0];
+  const set: typeof sets[number] | typeof setsV2[number] | undefined = user.featureFlags?.includes("ffMealsV2")
+    ? setsV2[0]
+    : sets[0];
   const exercise = measurements.find((measurement) => measurement.type === "exercise");
   const steps = measurements.find((measurement) => measurement.type === "steps").meta?.value;
   const goal = user.meta?.stepsGoal ?? 7000;

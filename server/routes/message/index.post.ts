@@ -114,6 +114,84 @@ const getReportUser = async (id: string, timezone: string = "Europe/Kyiv") => {
     },
     {
       $lookup: {
+        from: "sets-v2",
+        let: { userId: { $toString: "$_id" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$userId", "$$userId"] },
+              createdAt: { $gte: startDate, $lt: endDate }
+            },
+          },
+          {
+            $lookup: {
+              from: "ingredients-v2",
+              let: { ingredientId: "$ingredients.id" },
+              pipeline: [
+                {
+                  $match: {
+                    $expr: { $in: [{ $toString: "$_id" }, "$$ingredientId"] }
+                  }
+                },
+                {
+                  $lookup: {
+                    from: "categories-v2",
+                    localField: "categoryId",
+                    foreignField: "_id",
+                    as: "categories"
+                  }
+                },
+                {
+                  $addFields: {
+                    category: { $first: "$categories" }
+                  }
+                },
+                {
+                  $project: {
+                    categories: 0
+                  }
+                }
+              ],
+              as: "ingredientModels"
+            }
+          },
+          {
+            $addFields: {
+              ingredients: {
+                $map: {
+                  input: "$ingredients",
+                  as: "ingredient",
+                  in: {
+                    $mergeObjects: [
+                      "$$ingredient",
+                      {
+                        ingredient: {
+                          $first: {
+                            $filter: {
+                              input: "$ingredientModels",
+                              as: "model",
+                              cond: { $eq: [{ $toString: "$$model._id" }, "$$ingredient.id"] }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            $project: {
+              ingredientModels: 0
+            }
+          }
+        ],
+        as: "setsV2"
+      }
+    },
+    {
+      $lookup: {
         from: "messages",
         let: { userId: { $toString: "$_id" } },
         pipeline: [
