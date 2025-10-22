@@ -152,17 +152,12 @@ export default eventHandler(async (event) => {
 
       const name = `${validated.firstName} ${validated.lastName}`.trim();
 
+      const content = md`_*Зареестрований новий користувач:*_` + "\n"
+        + md`*Користувач:* [${name}](tg://user?id=${user.id})` + "\n"
+        + md`*Профіль в додатку:* [Відкрити](https://t.me/${telegram.botInfo.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())})` + "\n\n"
+        + fieldMessages.join("\n");
+
       const sendMessageToReceiver = async (withoutUserProfile: boolean = false, withoutUserMessages: boolean = false) => {
-        let content = md`_*Зареестрований новий користувач:*_` + "\n";
-
-        if (!withoutUserProfile) {
-          content += md`*Користувач:* [${name}](tg://user?id=${user.id})` + "\n";
-        }
-
-        content += md`*Профіль в додатку:* [Відкрити](https://t.me/${telegram.botInfo.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())})` +
-          "\n\n" +
-          fieldMessages.join("\n");
-
         let inlineKeyboard = new InlineKeyboard();
 
         if (!withoutUserProfile) {
