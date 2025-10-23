@@ -233,6 +233,26 @@ const getReportUser = async (id: string, timezone: string = "Europe/Kyiv") => {
       }
     },
     {
+      $lookup: {
+        from: "notes-v2",
+        let: { userId: { $toString: "$_id" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$userId", "$$userId"] },
+              createdAt: { $gte: startDate, $lt: endDate }
+            }
+          },
+          {
+            $sort: {
+              createdAt: 1
+            }
+          }
+        ],
+        as: "notesV2"
+      }
+    },
+    {
       $match: {
         measurements: {
           $elemMatch: {
