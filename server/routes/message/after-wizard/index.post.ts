@@ -15,6 +15,7 @@ const requestBodySchema = z.object({
   isGaveBirth: z.enum(["no", "yes"]).nullish(),
   gaveBirth: z.coerce.date().nullish(),
   breastfeeding: z.enum(["no", "yes"]).nullish(),
+  alcoholConsumption: z.enum(["no", "yes"]).nullish(),
   receiverId: z.number(),
 });
 
