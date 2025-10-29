@@ -27,6 +27,7 @@ const userMetaSchema = z.object({
   endocrineDisorders: z.string().nonempty().nullish(),
   physicalActivity: z.string(),
   foodIntolerances: z.string().nonempty().nullish(),
+  alcoholConsumption: z.enum(["no", "yes"]).nullish(),
 });
 
 export default eventHandler(async (event) => {
@@ -113,6 +114,10 @@ export default eventHandler(async (event) => {
         },
         foodIntolerances: {
           name: "Непереносимість певних продуктів",
+        },
+        alcoholConsumption: {
+          name: "Чи вживаєте ви алкоголь",
+          conversion: (value) => value === "yes" ? "Так" : "Ні",
         },
         goalWeight: {
           name: "Цільова вага",
