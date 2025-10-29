@@ -57,7 +57,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["_id", "createdAt", "updatedAt"],
+              "enum": [
+                "_id",
+                "createdAt",
+                "updatedAt"
+              ],
               "default": "createdAt"
             },
             "description": "Field to order by"
@@ -68,7 +72,10 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["asc", "desc"],
+              "enum": [
+                "asc",
+                "desc"
+              ],
               "default": "asc"
             },
             "description": "Sort direction"
@@ -437,14 +444,19 @@
             "example": "Europe/Kyiv"
           }
         },
-        "required": ["receiverId"]
+        "required": [
+          "receiverId"
+        ]
       },
       "MessageAfterWizardRequest": {
         "type": "object",
         "properties": {
           "sex": {
             "type": "string",
-            "enum": ["male", "female"],
+            "enum": [
+              "male",
+              "female"
+            ],
             "description": "The user's gender",
             "example": "male"
           },
@@ -497,13 +509,19 @@
           },
           "whereDoSports": {
             "type": "string",
-            "enum": ["gym", "home"],
+            "enum": [
+              "gym",
+              "home"
+            ],
             "description": "Where the user plans to exercise",
             "example": "gym"
           },
           "isGaveBirth": {
             "type": "string",
-            "enum": ["no", "yes"],
+            "enum": [
+              "no",
+              "yes"
+            ],
             "nullable": true,
             "description": "Whether the user has given birth",
             "example": "yes"
@@ -517,9 +535,22 @@
           },
           "breastfeeding": {
             "type": "string",
-            "enum": ["no", "yes"],
+            "enum": [
+              "no",
+              "yes"
+            ],
             "nullable": true,
             "description": "Whether the user is breastfeeding",
+            "example": "no"
+          },
+          "alcoholConsumption": {
+            "type": "string",
+            "enum": [
+              "no",
+              "yes"
+            ],
+            "nullable": true,
+            "description": "Whether the user consumes alcohol",
             "example": "no"
           },
           "receiverId": {
@@ -585,7 +616,15 @@
             "example": 0
           }
         },
-        "required": ["_id", "userId", "content", "receiverId", "createdAt", "updatedAt", "__v"]
+        "required": [
+          "_id",
+          "userId",
+          "content",
+          "receiverId",
+          "createdAt",
+          "updatedAt",
+          "__v"
+        ]
       },
       "MessagesResponse": {
         "type": "array",
@@ -600,7 +639,9 @@
             "$ref": "#/components/schemas/Message"
           }
         },
-        "required": ["message"]
+        "required": [
+          "message"
+        ]
       },
       "MessageAfterWizardResponse": {
         "type": "object",
@@ -654,7 +695,10 @@
             "example": 70
           }
         },
-        "required": ["id", "value"]
+        "required": [
+          "id",
+          "value"
+        ]
       },
       "MeasurementMessageRequest": {
         "type": "object",
@@ -684,7 +728,15 @@
             "minimum": 1
           }
         },
-        "required": ["weight", "waist", "shoulder", "hip", "hips", "chest", "receiverId"]
+        "required": [
+          "weight",
+          "waist",
+          "shoulder",
+          "hip",
+          "hips",
+          "chest",
+          "receiverId"
+        ]
       },
       "MeasurementMessageResponse": {
         "type": "object",
