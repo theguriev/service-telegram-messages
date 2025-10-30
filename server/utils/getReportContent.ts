@@ -1,3 +1,4 @@
+import Big from "big.js";
 import { differenceInDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { groupBy, sumBy } from "es-toolkit";
@@ -7,9 +8,12 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
   showDate?: boolean;
   timezone?: string;
 }) => {
-  const { notes, sets, measurements } = user;
+  const { sets, measurements, setsV2 } = user;
+  const notes = user.featureFlags?.includes("ffMealsV2") ? user.notesV2 : user.notes;
   const utcStartDate = resolveStartDate(date.date, "Etc/UTC", true);
-  const set: typeof sets[number] | undefined = sets[0];
+  const set: typeof sets[number] | typeof setsV2[number] | undefined = user.featureFlags?.includes("ffMealsV2")
+    ? setsV2[0]
+    : sets[0];
   const exercise = measurements.find((measurement) => measurement.type === "exercise");
   const steps = measurements.find((measurement) => measurement.type === "steps").meta?.value;
   const goal = user.meta?.stepsGoal ?? 7000;
@@ -37,7 +41,9 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
       (
         item: typeof ingredients[number]
       ) => {
-        return item.ingredient[key] * item.value;
+        return user.featureFlags?.includes("ffMealsV2")
+          ? new Big(item.ingredient[key]).mul(item.ingredient.grams).div(100).mul(item.value).toNumber()
+          : new Big(item.ingredient[key]).mul(item.value).toNumber();
       };
   const totalCaloriesToday = sumBy(
     ingredients,
@@ -50,15 +56,27 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
 
   const groupedSets = groupBy(ingredients, (item) => item.ingredient.category.name);
 
+  const setMessageSelector = ({ additionalInfo, value, ingredient: {
+    name,
+    grams,
+  } }: typeof groupedSets[string][number]) => {
+    if (user.featureFlags?.includes("ffMealsV2")) {
+      return md`>• *${name}* \(${new Big(grams).mul(value)}г\)${additionalInfo?.trim()
+        ? ` - "${additionalInfo.trim()}"`
+        : ""}`
+    }
+
+    return md`>• *${name}* \(${grams}г\): ${new Big(value).mul(100)}%${additionalInfo?.trim()
+      ? ` - "${additionalInfo.trim()}"`
+      : ""}`
+  };
+
   const categoryMessages = Object.entries(groupedSets)
     .map(([category, sets]) =>
       md`>*Категорія ${category}:*` +
       "\n" +
       sets
-        .map((set) => md`>• *${set.ingredient.name}* \(${set.ingredient.grams}г\): ${set.value * 100}%${set.additionalInfo?.trim()
-          ? ` - "${set.additionalInfo.trim()}"`
-          : ""}`
-        )
+        .map(setMessageSelector)
         .join("\n")
     );
   const categoriesMessage = categoryMessages.length

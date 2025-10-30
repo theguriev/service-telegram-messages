@@ -11,6 +11,7 @@ const userSchema = new Schema(
     hash: String,
     role: String,
     permissions: { type: [String], default: [] },
+    featureFlags: { type: [String], default: [] },
     privateKey: { type: String, select: false },
     address: String,
     meta: {

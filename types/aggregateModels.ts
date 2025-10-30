@@ -22,6 +22,15 @@ export interface Category {
   updatedAt: Date;
 };
 
+export interface CategoryV2 {
+  _id: Types.ObjectId;
+  name: string;
+  userId: string;
+  templateId: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export interface Ingredient {
   _id: Types.ObjectId;
   name: string;
@@ -64,6 +73,14 @@ export interface ReportUser extends User {
       }
     })[]
   })[];
+  setsV2: (Omit<Set, 'ingredients'> & {
+    ingredients: (ArrayType<Set["ingredients"]> & {
+      ingredient?: Ingredient & {
+        category: CategoryV2;
+      }
+    })[]
+  })[];
   messages: Message[];
   notes: Note[];
+  notesV2: Note[];
 };
