@@ -15,7 +15,7 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
     ? setsV2[0]
     : sets[0];
   const exercise = measurements.find((measurement) => measurement.type === "exercise");
-  const steps = measurements.find((measurement) => measurement.type === "steps").meta?.value;
+  const steps = measurements.find((measurement) => measurement.type === "steps")?.meta?.value;
   const goal = user.meta?.stepsGoal ?? 7000;
 
   const message = user.messages[0];

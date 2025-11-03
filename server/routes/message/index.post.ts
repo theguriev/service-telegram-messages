@@ -252,15 +252,6 @@ const getReportUser = async (id: string, timezone: string = "Europe/Kyiv") => {
         as: "notesV2"
       }
     },
-    {
-      $match: {
-        measurements: {
-          $elemMatch: {
-            type: "steps",
-          }
-        }
-      }
-    },
   ]))[0] as ReportUser | undefined;
 };
 
