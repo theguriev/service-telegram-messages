@@ -2,6 +2,7 @@ import Big from "big.js";
 import { differenceInDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import { groupBy, sumBy } from "es-toolkit";
+import { IngredientV2 } from "~~/types/aggregateModels";
 
 const getReportContent = async (user: ReportUser & { balance: number }, date: {
   date: Date;
@@ -41,9 +42,15 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
       (
         item: typeof ingredients[number]
       ) => {
-        return user.featureFlags?.includes("ffMealsV2")
-          ? new Big(item.ingredient[key]).mul(item.ingredient.grams).div(100).mul(item.value).toNumber()
-          : new Big(item.ingredient[key]).mul(item.value).toNumber();
+        if (!user.featureFlags?.includes("ffMealsV2")) {
+          return new Big(item.ingredient[key]).mul(item.value).toNumber()
+        }
+
+        if ((item.ingredient as IngredientV2).unit === "pieces") {
+          return new Big(item.ingredient.grams).mul(item.value).round().mul(item.ingredient[key]).toNumber()
+        }
+
+        return new Big(item.ingredient[key]).mul(item.ingredient.grams).div(100).mul(item.value).toNumber();
       };
   const totalCaloriesToday = sumBy(
     ingredients,
@@ -56,12 +63,17 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
 
   const groupedSets = groupBy(ingredients, (item) => item.ingredient.category.name);
 
-  const setMessageSelector = ({ additionalInfo, value, ingredient: {
-    name,
-    grams,
-  } }: typeof groupedSets[string][number]) => {
+  const setMessageSelector = ({ additionalInfo, value, ingredient }: typeof groupedSets[string][number]) => {
+    const { name, grams } = ingredient;
+
     if (user.featureFlags?.includes("ffMealsV2")) {
-      return md`>• *${name}* \(${new Big(grams).mul(value)}г\)${additionalInfo?.trim()
+      const { unit } = ingredient as IngredientV2;
+
+      const resultValue = unit === "pieces"
+        ? `${new Big(grams).mul(value).round()} шт.`
+        : `${new Big(grams).mul(value)}г`;
+
+      return md`>• *${name}* \(${resultValue}\)${additionalInfo?.trim()
         ? ` - "${additionalInfo.trim()}"`
         : ""}`
     }
