@@ -43,6 +43,19 @@ export interface Ingredient {
   updatedAt: Date;
 };
 
+export interface IngredientV2 {
+  _id: Types.ObjectId;
+  name: string;
+  userId: string;
+  calories: number;
+  proteins: number;
+  grams: number;
+  unit: "grams" | "pieces";
+  categoryId: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export interface Set {
   _id: Types.ObjectId;
   userId: string;
@@ -75,7 +88,7 @@ export interface ReportUser extends User {
   })[];
   setsV2: (Omit<Set, 'ingredients'> & {
     ingredients: (ArrayType<Set["ingredients"]> & {
-      ingredient?: Ingredient & {
+      ingredient?: IngredientV2 & {
         category: CategoryV2;
       }
     })[]
