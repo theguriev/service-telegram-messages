@@ -36,6 +36,70 @@ const getReportUser = async (id: string, timezone: string = "Europe/Kyiv") => {
     },
     {
       $lookup: {
+        from: "ingredients",
+        let: { userId: { $toString: "$_id" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$userId", "$$userId"] },
+            }
+          },
+          {
+            $lookup: {
+              from: "categories",
+              localField: "categoryId",
+              foreignField: "_id",
+              as: "categories"
+            }
+          },
+          {
+            $match: {
+              "categories.templateId": { $not: { $exists: true, $ne: null } }
+            }
+          },
+          {
+            $project: {
+              categories: 0
+            }
+          }
+        ],
+        as: "allIngredients"
+      }
+    },
+    {
+      $lookup: {
+        from: "ingredients-v2",
+        let: { userId: { $toString: "$_id" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$userId", "$$userId"] },
+            }
+          },
+          {
+            $lookup: {
+              from: "categories-v2",
+              localField: "categoryId",
+              foreignField: "_id",
+              as: "categories"
+            }
+          },
+          {
+            $match: {
+              "categories.templateId": { $not: { $exists: true, $ne: null } }
+            }
+          },
+          {
+            $project: {
+              categories: 0
+            }
+          }
+        ],
+        as: "allIngredientsV2"
+      }
+    },
+    {
+      $lookup: {
         from: "sets",
         let: { userId: { $toString: "$_id" } },
         pipeline: [
@@ -256,7 +320,7 @@ const getReportUser = async (id: string, timezone: string = "Europe/Kyiv") => {
 };
 
 export default eventHandler(async (event) => {
-  const { currencySymbol, telegramApp } = useRuntimeConfig();
+  const { currencySymbol, telegramApp, maxIngredientConsumption } = useRuntimeConfig();
   const { receiverId, timezone } = await zodValidateBody(event, requestBodySchema.parse);
 
   if (await canSend(event, timezone)) {
@@ -279,7 +343,7 @@ export default eventHandler(async (event) => {
       const content = await getReportContent({
         ...user,
         balance
-      }, { date: new Date(), timezone });
+      }, { date: new Date(), timezone, maxConsumption: Number(maxIngredientConsumption || 100) });
 
       if (!isWeekend) {
         const separator = "\n\n" + md`${"------------------------------------------------------"}` + "\n\n";

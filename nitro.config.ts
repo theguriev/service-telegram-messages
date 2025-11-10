@@ -16,6 +16,7 @@ export default defineNitroConfig({
     currencySymbol: "nka",
     restartTelegram: "false",
     restartTelegramInterval: "5000",
+    maxIngredientConsumption: 100,
   },
   experimental: {
     tasks: true,

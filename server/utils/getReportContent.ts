@@ -1,22 +1,30 @@
 import Big from "big.js";
 import { differenceInDays } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
-import { groupBy, sumBy } from "es-toolkit";
-import { IngredientV2 } from "~~/types/aggregateModels";
+import { groupBy, sum, sumBy } from "es-toolkit";
+import { Ingredient, IngredientV2 } from "~~/types/aggregateModels";
 
-const getReportContent = async (user: ReportUser & { balance: number }, date: {
+const getReportContent = async (user: ReportUser & { balance: number }, options: {
   date: Date;
   showDate?: boolean;
   timezone?: string;
+  maxConsumption?: number;
 }) => {
-  const { sets, measurements, setsV2 } = user;
-  const notes = user.featureFlags?.includes("ffMealsV2") ? user.notesV2 : user.notes;
-  const utcStartDate = resolveStartDate(date.date, "Etc/UTC", true);
-  const set: typeof sets[number] | typeof setsV2[number] | undefined = user.featureFlags?.includes("ffMealsV2")
-    ? setsV2[0]
-    : sets[0];
-  const exercise = measurements.find((measurement) => measurement.type === "exercise");
-  const steps = measurements.find((measurement) => measurement.type === "steps")?.meta?.value;
+  const { sets, measurements, setsV2, allIngredients, allIngredientsV2 } = user;
+  const currentAllIngredients = user.featureFlags?.includes("ffMealsV2")
+    ? allIngredientsV2
+    : allIngredients;
+  const notes = user.featureFlags?.includes("ffMealsV2")
+    ? user.notesV2
+    : user.notes;
+  const utcStartDate = resolveStartDate(options.date, "Etc/UTC", true);
+  const set: (typeof sets)[number] | (typeof setsV2)[number] | undefined =
+    user.featureFlags?.includes("ffMealsV2") ? setsV2[0] : sets[0];
+  const exercise = measurements.find(
+    (measurement) => measurement.type === "exercise",
+  );
+  const steps = measurements.find((measurement) => measurement.type === "steps")
+    ?.meta?.value;
   const goal = user.meta?.stepsGoal ?? 7000;
 
   const message = user.messages[0];
@@ -27,41 +35,74 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
       ? resolveStartDate(message.createdAt, "Etc/UTC", true)
       : undefined;
   const appUsed = programStartDate
-    ? differenceInDays(
-        utcStartDate,
-        programStartDate,
-      ) + 1
+    ? differenceInDays(utcStartDate, programStartDate) + 1
     : 1;
 
-  const ingredients = (set?.ingredients.filter((item) => item.ingredient) ?? []) as (Omit<typeof set.ingredients[number], "ingredient"> & {
-    ingredient: NonNullable<typeof set.ingredients[number]["ingredient"]>;
-  })[];
+  const createIngredientValueSelector =
+    (key: KeyByType<Ingredient | IngredientV2, number>) =>
+    (item: Ingredient | IngredientV2) => {
+      if (!user.featureFlags?.includes("ffMealsV2")) {
+        return new Big(item[key]).round().toNumber();
+      }
 
-  const createSelector =
-    (key: KeyByType<typeof ingredients[number]["ingredient"], number>) =>
-      (
-        item: typeof ingredients[number]
-      ) => {
-        if (!user.featureFlags?.includes("ffMealsV2")) {
-          return new Big(item.ingredient[key]).mul(item.value).toNumber()
-        }
+      if ((item as IngredientV2).unit === "pieces") {
+        return new Big(item.grams).mul(item[key]).round().toNumber();
+      }
 
-        if ((item.ingredient as IngredientV2).unit === "pieces") {
-          return new Big(item.ingredient.grams).mul(item.value).round().mul(item.ingredient[key]).toNumber()
-        }
+      return new Big(item[key]).mul(item.grams).div(100).round().toNumber();
+    };
 
-        return new Big(item.ingredient[key]).mul(item.ingredient.grams).div(100).mul(item.value).toNumber();
-      };
+  const selectRecommendationValue = (
+    key: KeyByType<Ingredient | IngredientV2, number>,
+  ) =>
+    new Big(
+      sum(
+        Object.values(
+          currentAllIngredients.reduce(
+            (acc, item) => {
+              const value = createIngredientValueSelector(key)(item);
+              return value >= (acc[item.categoryId.toString()] ?? 0)
+                ? { ...acc, [item.categoryId.toString()]: value }
+                : acc;
+            },
+            {} as Record<string, number>,
+          ),
+        ),
+      ),
+    )
+      .mul(options.maxConsumption ?? 100)
+      .div(100)
+      .round()
+      .toNumber();
+
+  const ingredientsCaloriesRecommendation = selectRecommendationValue("calories");
+
+  const ingredients = (set?.ingredients.filter((item) => item.ingredient) ??
+    []) as (Omit<(typeof set.ingredients)[number], "ingredient"> & {
+      ingredient: NonNullable<(typeof set.ingredients)[number]["ingredient"]>;
+    })[];
+
+  const createSetValueSelector =
+    (key: KeyByType<Ingredient | IngredientV2, number>) =>
+    (item: (typeof ingredients)[number]) =>
+    new Big(createIngredientValueSelector(key)(item.ingredient))
+      .mul(item.value)
+      .round()
+      .toNumber();
+
   const totalCaloriesToday = sumBy(
     ingredients,
-    createSelector("calories")
+    createSetValueSelector("calories"),
   );
   const totalProteinToday = sumBy(
     ingredients,
-    createSelector("proteins")
+    createSetValueSelector("proteins"),
   );
 
-  const groupedSets = groupBy(ingredients, (item) => item.ingredient.category.name);
+  const groupedSets = groupBy(
+    ingredients,
+    (item) => item.ingredient.category.name,
+  );
 
   const setMessageSelector = ({ additionalInfo, value, ingredient }: typeof groupedSets[string][number]) => {
     const { name, grams } = ingredient;
@@ -71,9 +112,9 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
 
       const resultValue = unit === "pieces"
         ? `${new Big(grams).mul(value).round()} шт.`
-        : `${new Big(grams).mul(value)}г`;
+        : `${new Big(grams).mul(value).round()}г`;
 
-      return md`>• *${name}* \(${resultValue}\)${additionalInfo?.trim()
+      return md`>• *${name}* \(${resultValue}\) \(${new Big(value).mul(100).round()}\% від рекомендованої\)${additionalInfo?.trim()
         ? ` - "${additionalInfo.trim()}"`
         : ""}`
     }
@@ -84,6 +125,7 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
   };
 
   const categoryMessages = Object.entries(groupedSets)
+    .sort(([categoryA], [categoryB]) => categoryA.localeCompare(categoryB, "uk-UA"))
     .map(([category, sets]) =>
       md`>*Категорія ${category}:*` +
       "\n" +
@@ -110,8 +152,8 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
   const lastName = user.meta?.lastName?.trim() || user.lastName?.trim() || "";
   const name = `${firstName} ${lastName}`.trim() || "Невідомий";
 
-  const dateHeading = date.showDate
-    ? md`*_Щоденний звіт за ${toZonedTime(date.date, date.timezone ?? "Europe/Kyiv").toLocaleDateString("uk-UA")}:_*` + "\n"
+  const dateHeading = options.showDate
+    ? md`*_Щоденний звіт за ${toZonedTime(options.date, options.timezone ?? "Europe/Kyiv").toLocaleDateString("uk-UA")}:_*` + "\n"
     : "";
 
   const heading =
@@ -124,7 +166,7 @@ const getReportContent = async (user: ReportUser & { balance: number }, date: {
   const nutrition =
     md`**>*_Харчування:_*` +
     "\n" +
-    md`>*Калорії:* ${totalCaloriesToday} ккал` +
+    md`>*Калорії:* ${totalCaloriesToday} ккал / ${ingredientsCaloriesRecommendation} ккал` +
     "\n" +
     md`>*Білки:* ${totalProteinToday} г` +
     `\n${md`>`}\n` +
