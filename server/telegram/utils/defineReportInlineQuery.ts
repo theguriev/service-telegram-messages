@@ -13,7 +13,7 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
     ...params,
     selfArticle: {
       ...params.selfArticle,
-      text: (user) => getReportContent(user, { date: params.date(), showDate: true }),
+      text: (user, { config: { maxIngredientConsumption } }) => getReportContent(user, { date: params.date(), showDate: true, maxConsumption: Number(maxIngredientConsumption || 100) }),
       reply_markup: (user, { ctx, config: { telegramApp } }) => new InlineKeyboard()
         .url("Перейти до користувача", `https://t.me/${ctx.me.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`),
       textOptions: {
@@ -22,7 +22,7 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
     },
     managedArticle: {
       ...params.managedArticle,
-      text: (user) => getReportContent(user, { date: params.date(), showDate: true }),
+      text: (user, { config: { maxIngredientConsumption } }) => getReportContent(user, { date: params.date(), showDate: true, maxConsumption: Number(maxIngredientConsumption || 100) }),
       reply_markup: (user, { ctx, config: { telegramApp } }) => new InlineKeyboard()
         .url("Перейти до користувача", `https://t.me/${ctx.me.username}/${telegramApp}?startapp=user_${encodeURIComponent(user._id.toString())}`),
       textOptions: {
@@ -47,6 +47,70 @@ const defineReportInlineQuery = <TWord extends string>(params: ReportQueryParams
               }
             ],
             as: "measurements"
+          }
+        },
+        {
+          $lookup: {
+            from: "ingredients",
+            let: { userId: { $toString: "$_id" } },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$userId", "$$userId"] },
+                }
+              },
+              {
+                $lookup: {
+                  from: "categories",
+                  localField: "categoryId",
+                  foreignField: "_id",
+                  as: "categories"
+                }
+              },
+              {
+                $match: {
+                  "categories.templateId": { $not: { $exists: true, $ne: null } }
+                }
+              },
+              {
+                $project: {
+                  categories: 0
+                }
+              }
+            ],
+            as: "allIngredients"
+          }
+        },
+        {
+          $lookup: {
+            from: "ingredients-v2",
+            let: { userId: { $toString: "$_id" } },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: ["$userId", "$$userId"] },
+                }
+              },
+              {
+                $lookup: {
+                  from: "categories-v2",
+                  localField: "categoryId",
+                  foreignField: "_id",
+                  as: "categories"
+                }
+              },
+              {
+                $match: {
+                  "categories.templateId": { $not: { $exists: true, $ne: null } }
+                }
+              },
+              {
+                $project: {
+                  categories: 0
+                }
+              }
+            ],
+            as: "allIngredientsV2"
           }
         },
         {
