@@ -1,835 +1,806 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "title": "Telegram Messages Service",
-    "version": "1.0.0"
-  },
-  "paths": {
-    "/message": {
-      "get": {
-        "summary": "Get messages for the authenticated user",
-        "parameters": [
-          {
-            "name": "startDate",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "description": "Start date for filtering messages (inclusive)"
-          },
-          {
-            "name": "endDate",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "description": "End date for filtering messages (inclusive)"
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 0,
-              "default": 0
-            },
-            "description": "Number of items to skip"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "minimum": 1,
-              "default": 100
-            },
-            "description": "Maximum number of items to return"
-          },
-          {
-            "name": "orderBy",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "_id",
-                "createdAt",
-                "updatedAt"
-              ],
-              "default": "createdAt"
-            },
-            "description": "Field to order by"
-          },
-          {
-            "name": "orderDirection",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ],
-              "default": "asc"
-            },
-            "description": "Sort direction"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of messages",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessagesResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Sends message to selected user",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MessageRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Message sucessfully sent",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Message was already sent today",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/message/can-send": {
-      "get": {
-        "summary": "Check if user can send message",
-        "parameters": [
-          {
-            "name": "timezone",
-            "in": "query",
-            "description": "Timezone for date comparison",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CanSendResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/message/after-wizard": {
-      "post": {
-        "summary": "Sends message to selected user after completing the wizard",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MessageAfterWizardRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Message successfully sent",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageAfterWizardResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Message was already sent",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/message/after-wizard/can-send": {
-      "get": {
-        "summary": "Check if user can send message after completing the wizard",
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CanSendAfterWizardResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/message/measurements": {
-      "post": {
-        "summary": "Sends measurements to selected user",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MeasurementMessageRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Measurements successfully sent",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MeasurementMessageResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Measurements already sent",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/message/user-photo/{userId}": {
-      "get": {
-        "summary": "Get user photo",
-        "description": "Get user photo",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "pattern": "^[0-9a-fA-F]{24}$"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "image/webp": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "MessageRequest": {
-        "type": "object",
-        "properties": {
-          "receiverId": {
-            "type": "number",
-            "example": 379669527
-          },
-          "timezone": {
-            "type": "string",
-            "example": "Europe/Kyiv"
-          }
-        },
-        "required": [
-          "receiverId"
-        ]
-      },
-      "MessageAfterWizardRequest": {
-        "type": "object",
-        "properties": {
-          "sex": {
-            "type": "string",
-            "enum": [
-              "male",
-              "female"
-            ],
-            "description": "The user's gender",
-            "example": "male"
-          },
-          "birthday": {
-            "type": "string",
-            "format": "date",
-            "description": "The user's date of birth",
-            "example": "1990-01-01"
-          },
-          "height": {
-            "type": "number",
-            "description": "The user's height in centimeters",
-            "example": 180
-          },
-          "weight": {
-            "type": "number",
-            "description": "The user's weight in kilograms",
-            "example": 75
-          },
-          "waist": {
-            "type": "number",
-            "description": "The user's waist circumference in centimeters",
-            "example": 80
-          },
-          "shoulder": {
-            "type": "number",
-            "description": "The user's shoulder circumference in centimeters",
-            "example": 100
-          },
-          "hip": {
-            "type": "number",
-            "description": "The user's hip circumference in centimeters",
-            "example": 60
-          },
-          "hips": {
-            "type": "number",
-            "description": "The user's hips circumference in centimeters",
-            "example": 95
-          },
-          "chest": {
-            "type": "number",
-            "description": "The user's chest circumference in centimeters",
-            "example": 90
-          },
-          "goalWeight": {
-            "type": "number",
-            "minimum": 1,
-            "description": "The user's target weight in kilograms",
-            "example": 70
-          },
-          "whereDoSports": {
-            "type": "string",
-            "enum": [
-              "gym",
-              "home"
-            ],
-            "description": "Where the user plans to exercise",
-            "example": "gym"
-          },
-          "isGaveBirth": {
-            "type": "string",
-            "enum": [
-              "no",
-              "yes"
-            ],
-            "nullable": true,
-            "description": "Whether the user has given birth",
-            "example": "yes"
-          },
-          "gaveBirth": {
-            "type": "string",
-            "format": "date",
-            "nullable": true,
-            "description": "The date of childbirth, if applicable",
-            "example": "2020-05-15"
-          },
-          "breastfeeding": {
-            "type": "string",
-            "enum": [
-              "no",
-              "yes"
-            ],
-            "nullable": true,
-            "description": "Whether the user is breastfeeding",
-            "example": "no"
-          },
-          "alcoholConsumption": {
-            "type": "string",
-            "enum": [
-              "no",
-              "yes"
-            ],
-            "nullable": true,
-            "description": "Whether the user consumes alcohol",
-            "example": "no"
-          },
-          "receiverId": {
-            "type": "number",
-            "description": "The ID of the message receiver",
-            "example": 379669527
-          }
-        },
-        "required": [
-          "sex",
-          "firstName",
-          "lastName",
-          "birthday",
-          "height",
-          "weight",
-          "waist",
-          "shoulder",
-          "hip",
-          "hips",
-          "chest",
-          "physicalActivity",
-          "goalWeight",
-          "whereDoSports",
-          "receiverId"
-        ]
-      },
-      "Message": {
-        "type": "object",
-        "properties": {
-          "_id": {
-            "type": "string",
-            "example": "64e0f3b2c4d5f8a1b2c4d5f8a"
-          },
-          "userId": {
-            "type": "string",
-            "example": "379669527"
-          },
-          "content": {
-            "type": "string",
-            "description": "Message content in markdownV2 format",
-            "example": "Hello, this is a test message"
-          },
-          "receiverId": {
-            "type": "number",
-            "example": 379669527
-          },
-          "didntSend": {
-            "type": "boolean",
-            "example": false
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2023-10-01T12:00:00Z"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2023-10-01T12:00:00Z"
-          },
-          "__v": {
-            "type": "number",
-            "example": 0
-          }
-        },
-        "required": [
-          "_id",
-          "userId",
-          "content",
-          "receiverId",
-          "createdAt",
-          "updatedAt",
-          "__v"
-        ]
-      },
-      "MessagesResponse": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/Message"
-        }
-      },
-      "MessageResponse": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "$ref": "#/components/schemas/Message"
-          }
-        },
-        "required": [
-          "message"
-        ]
-      },
-      "MessageAfterWizardResponse": {
-        "type": "object",
-        "properties": {
-          "content": {
-            "type": "string",
-            "description": "Personalized message content after completing the wizard",
-            "example": "Thank you for completing the wizard! Here is your personalized message."
-          }
-        }
-      },
-      "CanSendResponse": {
-        "type": "object",
-        "properties": {
-          "canSend": {
-            "type": "boolean",
-            "example": true
-          }
-        }
-      },
-      "CanSendAfterWizardResponse": {
-        "type": "object",
-        "properties": {
-          "canSend": {
-            "type": "boolean",
-            "example": true
-          }
-        }
-      },
-      "Measurement": {
-        "type": "object",
-        "properties": {
-          "value": {
-            "type": "number",
-            "description": "Measurement value",
-            "example": 73
-          },
-          "lastValue": {
-            "type": "number",
-            "description": "Last recorded measurement value",
-            "example": 74
-          },
-          "startValue": {
-            "type": "number",
-            "description": "Initial measurement value",
-            "example": 80
-          },
-          "goal": {
-            "type": "number",
-            "description": "Target measurement value",
-            "example": 70
-          }
-        },
-        "required": [
-          "id",
-          "value"
-        ]
-      },
-      "MeasurementMessageRequest": {
-        "type": "object",
-        "properties": {
-          "weight": {
-            "$ref": "#/components/schemas/Measurement"
-          },
-          "waist": {
-            "$ref": "#/components/schemas/Measurement"
-          },
-          "shoulder": {
-            "$ref": "#/components/schemas/Measurement"
-          },
-          "hip": {
-            "$ref": "#/components/schemas/Measurement"
-          },
-          "hips": {
-            "$ref": "#/components/schemas/Measurement"
-          },
-          "chest": {
-            "$ref": "#/components/schemas/Measurement"
-          },
-          "receiverId": {
-            "type": "number",
-            "description": "The ID of the message receiver",
-            "example": 379669527,
-            "minimum": 1
-          }
-        },
-        "required": [
-          "weight",
-          "waist",
-          "shoulder",
-          "hip",
-          "hips",
-          "chest",
-          "receiverId"
-        ]
-      },
-      "MeasurementMessageResponse": {
-        "type": "object",
-        "properties": {
-          "content": {
-            "type": "string",
-            "description": "Message content in markdownV2 format",
-            "example": "Your measurements have been successfully recorded."
-          },
-          "message": {
-            "type": "object",
-            "properties": {
-              "_id": {
-                "type": "string",
-                "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
-                "pattern": "^[a-fA-F0-9]{24}$"
-              },
-              "userId": {
-                "type": "string",
-                "example": "64e0f3b2c4d5f8a1b2c4d5f8b",
-                "pattern": "^[a-fA-F0-9]{24}$"
-              },
-              "receiverId": {
-                "type": "number",
-                "example": 379669527
-              },
-              "measurements": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "_id": {
-                      "type": "string",
-                      "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
-                      "pattern": "^[a-fA-F0-9]{24}$"
-                    },
-                    "id": {
-                      "type": "string",
-                      "example": "64e0f3b2c4d5f8a1b2c4d5f8a",
-                      "pattern": "^[a-fA-F0-9]{24}$"
-                    },
-                    "value": {
-                      "type": "number",
-                      "example": 75
-                    },
-                    "type": {
-                      "type": "string",
-                      "example": "weight"
-                    }
-                  }
-                }
-              },
-              "createdAt": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2023-10-01T12:00:00Z"
-              },
-              "updatedAt": {
-                "type": "string",
-                "format": "date-time",
-                "example": "2023-10-01T12:00:00Z"
-              },
-              "__v": {
-                "type": "number",
-                "example": 0
-              }
-            }
-          }
-        }
-      },
-      "ErrorResponse": {
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string",
-            "example": "/message"
-          },
-          "statusCode": {
-            "type": "number",
-            "example": 400
-          },
-          "statusMessage": {
-            "type": "string",
-            "example": "Bad Request",
-            "nullable": true
-          },
-          "message": {
-            "type": "string",
-            "example": "Error message",
-            "nullable": true
-          }
-        }
-      }
-    }
-  }
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Telegram Messages Service",
+		"version": "1.0.0"
+	},
+	"paths": {
+		"/message": {
+			"get": {
+				"summary": "Get messages for the authenticated user",
+				"parameters": [
+					{
+						"name": "startDate",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"format": "date-time"
+						},
+						"description": "Start date for filtering messages (inclusive)"
+					},
+					{
+						"name": "endDate",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"format": "date-time"
+						},
+						"description": "End date for filtering messages (inclusive)"
+					},
+					{
+						"name": "offset",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"minimum": 0,
+							"default": 0
+						},
+						"description": "Number of items to skip"
+					},
+					{
+						"name": "limit",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "integer",
+							"minimum": 1,
+							"default": 100
+						},
+						"description": "Maximum number of items to return"
+					},
+					{
+						"name": "orderBy",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": ["_id", "createdAt", "updatedAt"],
+							"default": "createdAt"
+						},
+						"description": "Field to order by"
+					},
+					{
+						"name": "orderDirection",
+						"in": "query",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": ["asc", "desc"],
+							"default": "asc"
+						},
+						"description": "Sort direction"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "List of messages",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessagesResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Validation error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "Sends message to selected user",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/MessageRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Message sucessfully sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Validation error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Message was already sent today",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/message/can-send": {
+			"get": {
+				"summary": "Check if user can send message",
+				"parameters": [
+					{
+						"name": "timezone",
+						"in": "query",
+						"description": "Timezone for date comparison",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CanSendResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/message/after-wizard": {
+			"post": {
+				"summary": "Sends message to selected user after completing the wizard",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/MessageAfterWizardRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Message successfully sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MessageAfterWizardResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Validation error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Message was already sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/message/after-wizard/can-send": {
+			"get": {
+				"summary": "Check if user can send message after completing the wizard",
+				"responses": {
+					"200": {
+						"description": "Successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/CanSendAfterWizardResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/message/measurements": {
+			"post": {
+				"summary": "Sends measurements to selected user",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/MeasurementMessageRequest"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Measurements successfully sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MeasurementMessageResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Validation error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Measurements already sent",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/message/user-photo/{userId}": {
+			"get": {
+				"summary": "Get user photo",
+				"description": "Get user photo",
+				"parameters": [
+					{
+						"name": "userId",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"pattern": "^[0-9a-fA-F]{24}$"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"image/webp": {
+								"schema": {
+									"type": "string",
+									"format": "binary"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Validation error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"MessageRequest": {
+				"type": "object",
+				"properties": {
+					"receiverId": {
+						"type": "number",
+						"example": 379669527
+					},
+					"timezone": {
+						"type": "string",
+						"example": "Europe/Kyiv"
+					}
+				},
+				"required": ["receiverId"]
+			},
+			"MessageAfterWizardRequest": {
+				"type": "object",
+				"properties": {
+					"sex": {
+						"type": "string",
+						"enum": ["male", "female"],
+						"description": "The user's gender",
+						"example": "male"
+					},
+					"birthday": {
+						"type": "string",
+						"format": "date",
+						"description": "The user's date of birth",
+						"example": "1990-01-01"
+					},
+					"height": {
+						"type": "number",
+						"description": "The user's height in centimeters",
+						"example": 180
+					},
+					"weight": {
+						"type": "number",
+						"description": "The user's weight in kilograms",
+						"example": 75
+					},
+					"waist": {
+						"type": "number",
+						"description": "The user's waist circumference in centimeters",
+						"example": 80
+					},
+					"shoulder": {
+						"type": "number",
+						"description": "The user's shoulder circumference in centimeters",
+						"example": 100
+					},
+					"hip": {
+						"type": "number",
+						"description": "The user's hip circumference in centimeters",
+						"example": 60
+					},
+					"hips": {
+						"type": "number",
+						"description": "The user's hips circumference in centimeters",
+						"example": 95
+					},
+					"chest": {
+						"type": "number",
+						"description": "The user's chest circumference in centimeters",
+						"example": 90
+					},
+					"goalWeight": {
+						"type": "number",
+						"minimum": 1,
+						"description": "The user's target weight in kilograms",
+						"example": 70
+					},
+					"whereDoSports": {
+						"type": "string",
+						"enum": ["gym", "home"],
+						"description": "Where the user plans to exercise",
+						"example": "gym"
+					},
+					"isGaveBirth": {
+						"type": "string",
+						"enum": ["no", "yes"],
+						"nullable": true,
+						"description": "Whether the user has given birth",
+						"example": "yes"
+					},
+					"gaveBirth": {
+						"type": "string",
+						"format": "date",
+						"nullable": true,
+						"description": "The date of childbirth, if applicable",
+						"example": "2020-05-15"
+					},
+					"breastfeeding": {
+						"type": "string",
+						"enum": ["no", "yes"],
+						"nullable": true,
+						"description": "Whether the user is breastfeeding",
+						"example": "no"
+					},
+					"alcoholConsumption": {
+						"type": "string",
+						"enum": ["no", "yes"],
+						"nullable": true,
+						"description": "Whether the user consumes alcohol",
+						"example": "no"
+					},
+					"receiverId": {
+						"type": "number",
+						"description": "The ID of the message receiver",
+						"example": 379669527
+					}
+				},
+				"required": [
+					"sex",
+					"firstName",
+					"lastName",
+					"birthday",
+					"height",
+					"weight",
+					"waist",
+					"shoulder",
+					"hip",
+					"hips",
+					"chest",
+					"physicalActivity",
+					"goalWeight",
+					"whereDoSports",
+					"receiverId"
+				]
+			},
+			"Message": {
+				"type": "object",
+				"properties": {
+					"_id": {
+						"type": "string",
+						"example": "64e0f3b2c4d5f8a1b2c4d5f8a"
+					},
+					"userId": {
+						"type": "string",
+						"example": "379669527"
+					},
+					"content": {
+						"type": "string",
+						"description": "Message content in markdownV2 format",
+						"example": "Hello, this is a test message"
+					},
+					"receiverId": {
+						"type": "number",
+						"example": 379669527
+					},
+					"didntSend": {
+						"type": "boolean",
+						"example": false
+					},
+					"createdAt": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2023-10-01T12:00:00Z"
+					},
+					"updatedAt": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2023-10-01T12:00:00Z"
+					},
+					"__v": {
+						"type": "number",
+						"example": 0
+					}
+				},
+				"required": [
+					"_id",
+					"userId",
+					"content",
+					"receiverId",
+					"createdAt",
+					"updatedAt",
+					"__v"
+				]
+			},
+			"MessagesResponse": {
+				"type": "array",
+				"items": {
+					"$ref": "#/components/schemas/Message"
+				}
+			},
+			"MessageResponse": {
+				"type": "object",
+				"properties": {
+					"message": {
+						"$ref": "#/components/schemas/Message"
+					}
+				},
+				"required": ["message"]
+			},
+			"MessageAfterWizardResponse": {
+				"type": "object",
+				"properties": {
+					"content": {
+						"type": "string",
+						"description": "Personalized message content after completing the wizard",
+						"example": "Thank you for completing the wizard! Here is your personalized message."
+					}
+				}
+			},
+			"CanSendResponse": {
+				"type": "object",
+				"properties": {
+					"canSend": {
+						"type": "boolean",
+						"example": true
+					}
+				}
+			},
+			"CanSendAfterWizardResponse": {
+				"type": "object",
+				"properties": {
+					"canSend": {
+						"type": "boolean",
+						"example": true
+					}
+				}
+			},
+			"Measurement": {
+				"type": "object",
+				"properties": {
+					"value": {
+						"type": "number",
+						"description": "Measurement value",
+						"example": 73
+					},
+					"lastValue": {
+						"type": "number",
+						"description": "Last recorded measurement value",
+						"example": 74
+					},
+					"startValue": {
+						"type": "number",
+						"description": "Initial measurement value",
+						"example": 80
+					},
+					"goal": {
+						"type": "number",
+						"description": "Target measurement value",
+						"example": 70
+					}
+				},
+				"required": ["id", "value"]
+			},
+			"MeasurementMessageRequest": {
+				"type": "object",
+				"properties": {
+					"weight": {
+						"$ref": "#/components/schemas/Measurement"
+					},
+					"waist": {
+						"$ref": "#/components/schemas/Measurement"
+					},
+					"shoulder": {
+						"$ref": "#/components/schemas/Measurement"
+					},
+					"hip": {
+						"$ref": "#/components/schemas/Measurement"
+					},
+					"hips": {
+						"$ref": "#/components/schemas/Measurement"
+					},
+					"chest": {
+						"$ref": "#/components/schemas/Measurement"
+					},
+					"receiverId": {
+						"type": "number",
+						"description": "The ID of the message receiver",
+						"example": 379669527,
+						"minimum": 1
+					}
+				},
+				"required": [
+					"weight",
+					"waist",
+					"shoulder",
+					"hip",
+					"hips",
+					"chest",
+					"receiverId"
+				]
+			},
+			"MeasurementMessageResponse": {
+				"type": "object",
+				"properties": {
+					"content": {
+						"type": "string",
+						"description": "Message content in markdownV2 format",
+						"example": "Your measurements have been successfully recorded."
+					},
+					"message": {
+						"type": "object",
+						"properties": {
+							"_id": {
+								"type": "string",
+								"example": "64e0f3b2c4d5f8a1b2c4d5f8a",
+								"pattern": "^[a-fA-F0-9]{24}$"
+							},
+							"userId": {
+								"type": "string",
+								"example": "64e0f3b2c4d5f8a1b2c4d5f8b",
+								"pattern": "^[a-fA-F0-9]{24}$"
+							},
+							"receiverId": {
+								"type": "number",
+								"example": 379669527
+							},
+							"measurements": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"_id": {
+											"type": "string",
+											"example": "64e0f3b2c4d5f8a1b2c4d5f8a",
+											"pattern": "^[a-fA-F0-9]{24}$"
+										},
+										"id": {
+											"type": "string",
+											"example": "64e0f3b2c4d5f8a1b2c4d5f8a",
+											"pattern": "^[a-fA-F0-9]{24}$"
+										},
+										"value": {
+											"type": "number",
+											"example": 75
+										},
+										"type": {
+											"type": "string",
+											"example": "weight"
+										}
+									}
+								}
+							},
+							"createdAt": {
+								"type": "string",
+								"format": "date-time",
+								"example": "2023-10-01T12:00:00Z"
+							},
+							"updatedAt": {
+								"type": "string",
+								"format": "date-time",
+								"example": "2023-10-01T12:00:00Z"
+							},
+							"__v": {
+								"type": "number",
+								"example": 0
+							}
+						}
+					}
+				}
+			},
+			"ErrorResponse": {
+				"type": "object",
+				"properties": {
+					"url": {
+						"type": "string",
+						"example": "/message"
+					},
+					"statusCode": {
+						"type": "number",
+						"example": 400
+					},
+					"statusMessage": {
+						"type": "string",
+						"example": "Bad Request",
+						"nullable": true
+					},
+					"message": {
+						"type": "string",
+						"example": "Error message",
+						"nullable": true
+					}
+				}
+			}
+		}
+	}
 }

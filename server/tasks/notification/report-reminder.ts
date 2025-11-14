@@ -1,67 +1,72 @@
 import { startOfDay } from "date-fns";
 
 export default defineTask({
-  meta: {
-    name: "notification:report-reminder",
-    description: "Sends reminders to users, that didn't send report today",
-  },
-  async run() {
-    const { currencySymbol } = useRuntimeConfig();
-    const telegram = useTelegram();
+	meta: {
+		name: "notification:report-reminder",
+		description: "Sends reminders to users, that didn't send report today",
+	},
+	async run() {
+		const { currencySymbol } = useRuntimeConfig();
+		const telegram = useTelegram();
 
-    const startOfToday = startOfDay(new Date());
+		const startOfToday = startOfDay(new Date());
 
-    const result = await ModelUser.aggregate([
-      {
-        $match: {
-          'meta.managerId': { $exists: true, $ne: null },
-          ...matchCan("notification:report-reminder")
-        },
-      },
-      {
-        $lookup: {
-          from: 'messages',
-          let: { userId: '$_id' },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: [{ $toString: '$userId' }, { $toString: '$$userId' }] },
-                    { $gte: ['$createdAt', startOfToday] },
-                  ],
-                },
-              },
-            },
-            {
-              $limit: 1
-            }
-          ],
-          as: 'messages',
-        },
-      },
-      {
-        $match: {
-          messages: { $size: 0 },
-        },
-      },
-    ]);
+		const result = await ModelUser.aggregate([
+			{
+				$match: {
+					"meta.managerId": { $exists: true, $ne: null },
+					...matchCan("notification:report-reminder"),
+				},
+			},
+			{
+				$lookup: {
+					from: "messages",
+					let: { userId: "$_id" },
+					pipeline: [
+						{
+							$match: {
+								$expr: {
+									$and: [
+										{
+											$eq: [
+												{ $toString: "$userId" },
+												{ $toString: "$$userId" },
+											],
+										},
+										{ $gte: ["$createdAt", startOfToday] },
+									],
+								},
+							},
+						},
+						{
+							$limit: 1,
+						},
+					],
+					as: "messages",
+				},
+			},
+			{
+				$match: {
+					messages: { $size: 0 },
+				},
+			},
+		]);
 
-    for (const { _id, id, address } of result) {
-      try {
-        const balance = await getBalance(address, currencySymbol);
-        if (balance) {
-          const message = md`*Нагадування про звіт* \- Нагадуємо вам про щоденний звіт наставнику\. Просимо зайти в додаток, заповнити необхідну інформацію, та надіслати звіт\.`
+		for (const { _id, id, address } of result) {
+			try {
+				const balance = await getBalance(address, currencySymbol);
+				if (balance) {
+					const message = md`*Нагадування про звіт* \- Нагадуємо вам про щоденний звіт наставнику\. Просимо зайти в додаток, заповнити необхідну інформацію, та надіслати звіт\.`;
 
-          await telegram.sendMessage(id, message, {
-            parse_mode: "MarkdownV2"
-          });
-        }
-      } catch (error) {
-        console.error(`Error sending reminder to user ${_id}:`, error);
-      }
-    }
+					await telegram.sendMessage(id, message, {
+						parse_mode: "MarkdownV2",
+					});
+				}
+			} catch (error) {
+				console.error(`Error sending reminder to user ${_id}:`, error);
+			}
+		}
 
-    return { result: "Success" };
-  },
+		return { result: "Success" };
+	},
 });
