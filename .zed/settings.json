@@ -16,6 +16,7 @@
 		"source.fixAll.biome": true,
 		"source.organizeImports.biome": true
 	},
+	"format_on_save": "on",
 	"auto_install_extensions": {
 		"xml": true,
 		"biome": true,
