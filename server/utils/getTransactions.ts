@@ -1,33 +1,42 @@
 import { bllsBase } from "~~/constants";
 
 const getTransactions = async (options: {
-  symbol: string;
-  address?: string;
-  limit?: number;
-  offset?: number;
-  order?: 'asc' | 'desc';
-  orderBy?: '_id' | 'from' | 'to' | 'symbol' | 'timestamp' | 'message' | 'value';
+	symbol: string;
+	address?: string;
+	limit?: number;
+	offset?: number;
+	order?: "asc" | "desc";
+	orderBy?:
+		| "_id"
+		| "from"
+		| "to"
+		| "symbol"
+		| "timestamp"
+		| "message"
+		| "value";
 }) => {
-  if (process.env.VITEST === "true") {
-    return [];
-  }
+	if (process.env.VITEST === "true") {
+		return [];
+	}
 
-  return await $fetch<{
-      _id: string;
-      from: string;
-      to: string;
-      symbol: string;
-      timestamp: number;
-      message?: string;
-      value: number;
-    }[]>(`/billing/transactions`, {
-      baseURL: bllsBase,
-      query: {
-        ...options,
-      },
-      retry: 5,
-      retryDelay: 1000,
-    });
+	return await $fetch<
+		{
+			_id: string;
+			from: string;
+			to: string;
+			symbol: string;
+			timestamp: number;
+			message?: string;
+			value: number;
+		}[]
+	>(`/billing/transactions`, {
+		baseURL: bllsBase,
+		query: {
+			...options,
+		},
+		retry: 5,
+		retryDelay: 1000,
+	});
 };
 
 export default getTransactions;

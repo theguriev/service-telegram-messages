@@ -1,3 +1,1 @@
-export default [
-  "show-managed-users-in-inline-queries",
-] as const;
+export default ["show-managed-users-in-inline-queries"] as const;

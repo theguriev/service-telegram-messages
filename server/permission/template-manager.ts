@@ -1,3 +1,1 @@
-export default [
-  ...permissionManager,
-] as const;
+export default [...permissionManager] as const;

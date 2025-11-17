@@ -6,10 +6,10 @@ import yesterdayMeasurements from "./yesterdayMeasurements";
 import yesterdayReport from "./yesterdayReport";
 
 export default [
-  report,
-  yesterdayReport,
-  beforeYesterdayReport,
-  measurements,
-  yesterdayMeasurements,
-  beforeYesterdayMeasurements
+	report,
+	yesterdayReport,
+	beforeYesterdayReport,
+	measurements,
+	yesterdayMeasurements,
+	beforeYesterdayMeasurements,
 ];
