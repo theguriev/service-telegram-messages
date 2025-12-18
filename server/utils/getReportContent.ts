@@ -211,6 +211,11 @@ const getReportContent = async (
 				md`>• *Ваші почуття:* ${exercise.meta?.feeling}`
 			: md`>Сьогодні не було проведено тренування`);
 
+	const weeklyWorkoutsText =
+		md`>*_Тренування за тиждень (понеділок — неділя):_*` +
+		"\n" +
+		md`>*Проведено:* ${user.weeklyWorkoutsCount ?? 0}`;
+
 	const stepsText =
 		md`>*_Кроки:_*` +
 		"\n" +
@@ -222,6 +227,7 @@ const getReportContent = async (
 		`${heading}\n\n` +
 		`${nutrition}\n\n` +
 		`${exerciseText}\n\n` +
+		`${weeklyWorkoutsText}\n\n` +
 		`${stepsText}`
 	);
 };

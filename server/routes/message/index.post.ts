@@ -3,6 +3,8 @@ import { toZonedTime } from "date-fns-tz";
 import { InlineKeyboard } from "grammy";
 import { Types } from "mongoose";
 import { weekends } from "~~/constants";
+import resolveStartDate from "~~/utils/resolveStartDate";
+import resolveWeekDateRange from "~~/utils/resolveWeekDateRange";
 
 const requestBodySchema = z.object({
 	receiverId: z.number(),
@@ -12,6 +14,10 @@ const requestBodySchema = z.object({
 const getReportUser = async (id: string, timezone: string = "Europe/Kyiv") => {
 	const startDate = resolveStartDate(new Date(), timezone);
 	const endDate = addDays(startDate, 1);
+	const { start: weekStartDate, end: weekEndDate } = resolveWeekDateRange(
+		new Date(),
+		timezone,
+	);
 
 	return (
 		await ModelUser.aggregate<ReportUser>([
@@ -328,6 +334,40 @@ const getReportUser = async (id: string, timezone: string = "Europe/Kyiv") => {
 						},
 					],
 					as: "notesV2",
+				},
+			},
+			{
+				$lookup: {
+					from: "measurements",
+					let: { userId: { $toString: "$_id" } },
+					pipeline: [
+						{
+							$match: {
+								$expr: { $eq: ["$userId", "$$userId"] },
+								type: "exercise",
+								timestamp: {
+									$gte: weekStartDate.getTime(),
+									$lt: weekEndDate.getTime(),
+								},
+							},
+						},
+						{
+							$count: "count",
+						},
+					],
+					as: "weeklyWorkoutCount",
+				},
+			},
+			{
+				$addFields: {
+					weeklyWorkoutsCount: {
+						$ifNull: [{ $first: "$weeklyWorkoutCount.count" }, 0],
+					},
+				},
+			},
+			{
+				$project: {
+					weeklyWorkoutCount: 0,
 				},
 			},
 		])
