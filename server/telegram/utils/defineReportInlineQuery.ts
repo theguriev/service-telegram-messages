@@ -1,5 +1,6 @@
 import { addDays } from "date-fns";
 import { InlineKeyboard } from "grammy";
+import resolveWeekDateRange from "~~/utils/resolveWeekDateRange";
 
 type ManagedQueryParams<TWord extends string> = Parameters<
 	typeof defineManagedInlineQuery<TWord, ReportUser & { balance: number }>
@@ -61,6 +62,8 @@ const defineReportInlineQuery = <TWord extends string>(
 		customPipeline: () => {
 			const startDate = resolveStartDate(params.date());
 			const endDate = addDays(startDate, 1);
+			const { start: weekStartDate, end: weekEndDate } =
+				resolveWeekDateRange(params.date());
 
 			return [
 				{
@@ -379,6 +382,40 @@ const defineReportInlineQuery = <TWord extends string>(
 							},
 						],
 						as: "notesV2",
+					},
+				},
+				{
+					$lookup: {
+						from: "measurements",
+						let: { userId: { $toString: "$_id" } },
+						pipeline: [
+							{
+								$match: {
+									$expr: { $eq: ["$userId", "$$userId"] },
+									type: "exercise",
+									timestamp: {
+										$gte: weekStartDate.getTime(),
+										$lt: weekEndDate.getTime(),
+									},
+								},
+							},
+							{
+								$count: "count",
+							},
+						],
+						as: "weeklyWorkoutCount",
+					},
+				},
+				{
+					$addFields: {
+						weeklyWorkoutsCount: {
+							$ifNull: [{ $first: "$weeklyWorkoutCount.count" }, 0],
+						},
+					},
+				},
+				{
+					$project: {
+						weeklyWorkoutCount: 0,
 					},
 				},
 				{

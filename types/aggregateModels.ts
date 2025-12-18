@@ -98,4 +98,5 @@ export interface ReportUser extends User {
 	messages: Message[];
 	notes: Note[];
 	notesV2: Note[];
+	weeklyWorkoutsCount: number;
 }
