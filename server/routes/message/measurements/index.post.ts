@@ -139,7 +139,7 @@ export default eventHandler(async (event) => {
 		const content =
 			md`_*Користувач заповнив усі заміри:*_` +
 			"\n" +
-			md`*Користувач:* [${name}](tg://user?id=${user.id})` +
+			md`*Користувач:* [${name}]` + `(tg://user?id=${user.id})` +
 			"\n\n" +
 			fieldMessages.join("\n\n");
 
