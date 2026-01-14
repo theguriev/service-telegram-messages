@@ -4,13 +4,38 @@ import { toZonedTime } from "date-fns-tz";
 import { groupBy, sum, sumBy } from "es-toolkit";
 import { Ingredient, IngredientV2 } from "~~/types/aggregateModels";
 
-// Function to escape only user input data for MarkdownV2
-// (ingredients, categories, notes, feelings, user names)
-// Avoids double-escaping already escaped characters
-const escapeUserData = (text: string) => {
-  // Don't escape already escaped characters (preceded by \)
-  return text.replace(/(?<!\\)[_*\[\]()~`>#+=|{}.!-]/g, "\\$&");
-};
+const markdownV2EscapeList = [
+  "_",
+  "*",
+  "[",
+  "]",
+  "(",
+  ")",
+  "~",
+  "`",
+  ">",
+  "#",
+  "+",
+  "-",
+  "=",
+  "|",
+  "{",
+  "}",
+  ".",
+  "!",
+];
+
+/**
+ * Escape text for MarkdownV2
+ * @param {string} text
+ * @returns {string}
+ */
+const escapeMarkdown = (text: string): string =>
+  markdownV2EscapeList.reduce(
+    (oldText, charToEscape) =>
+      oldText.replaceAll(charToEscape, `\\${charToEscape}`),
+    text
+  );
 
 const getReportContent = async (
   user: ReportUser & { balance: number },
@@ -118,7 +143,7 @@ const getReportContent = async (
     value,
     ingredient,
   }: (typeof groupedSets)[string][number]) => {
-    const { name, grams } = ingredient;
+    const { name: ingredientName, grams } = ingredient;
 
     if (user.featureFlags?.includes("ffMealsV2")) {
       const { unit } = ingredient as IngredientV2;
@@ -128,21 +153,15 @@ const getReportContent = async (
           ? `${new Big(grams).mul(value).round()} шт.`
           : `${new Big(grams).mul(value).round()}г`;
 
-      return md`>• *${escapeUserData(name)}* (${resultValue}) (${new Big(value)
+      return `>• *${ingredientName}* (${resultValue}) (${new Big(value)
         .mul(100)
         .round()}% від рекомендованої)${
-        additionalInfo?.trim()
-          ? ` - "${escapeUserData(additionalInfo.trim())}"`
-          : ""
+        additionalInfo?.trim() ? ` - "${additionalInfo.trim()}"` : ""
       }`;
     }
 
-    return md`>• *${escapeUserData(name)}* (${grams}г): ${new Big(value).mul(
-      100
-    )}%${
-      additionalInfo?.trim()
-        ? ` - "${escapeUserData(additionalInfo.trim())}"`
-        : ""
+    return `>• *${ingredientName}* (${grams}г): ${new Big(value).mul(100)}%${
+      additionalInfo?.trim() ? ` - "${additionalInfo.trim()}"` : ""
     }`;
   };
 
@@ -152,29 +171,19 @@ const getReportContent = async (
     )
     .map(
       ([category, sets]) =>
-        md`>*Категорія ${escapeUserData(category)}:*` +
+        `>*Категорія ${category}:*` +
         "\n" +
         sets.map(setMessageSelector).join("\n")
     );
   const categoriesMessage = categoryMessages.length
-    ? categoryMessages.join(
-        `\n${md`
->
-        `}\n`
-      )
-    : md`
-> Немає інформації про інгредієнти
-      `;
+    ? categoryMessages.join(`\n>\n`)
+    : `>Немає інформації про інгредієнти`;
 
   const existingNotesMessage =
-    `\n${md`
->
-    `}\n` +
-    md`
-> _*Примітки користувача:*_
-    ` +
+    `\n>\n` +
+    `>*_Примітки користувача:_*` +
     "\n" +
-    notes.map((note) => md`>• ${escapeUserData(note.content)}`).join("\n");
+    notes.map((note) => `>• ${note.content}`).join("\n");
   const notesMessage = notes.length ? existingNotesMessage : "";
 
   const firstName =
@@ -183,7 +192,7 @@ const getReportContent = async (
   const name = `${firstName} ${lastName}`.trim() || "Невідомий";
 
   const dateHeading = options.showDate
-    ? md`*_Щоденний звіт за ${toZonedTime(
+    ? `*_Щоденний звіт за ${toZonedTime(
         options.date,
         options.timezone ?? "Europe/Kyiv"
       ).toLocaleDateString("uk-UA")}:_*` + "\n"
@@ -191,35 +200,27 @@ const getReportContent = async (
 
   const heading =
     dateHeading +
-    md`*Користувач:* [${escapeUserData(name || "Невідомий")}](tg://user?id=${
-      user.id
-    })` +
+    `*Користувач:* [${name || "Невідомий"}](tg://user?id=${user.id})` +
     "\n" +
-    md`*Кількість днів на програмі:* ${appUsed}` +
+    `*Кількість днів на програмі:* ${appUsed}` +
     "\n" +
-    md`*Кількість днів до завершення підписки:* ${user.balance}`;
+    `*Кількість днів до завершення підписки:* ${user.balance}`;
   const nutrition =
-    md`
-> _*Харчування:*_
-    ` +
+    `>*_Харчування:_*` +
     "\n" +
-    md`>*Калорії:* ${totalCaloriesToday} ккал / ${ingredientsCaloriesRecommendation} ккал` +
+    `>*Калорії:* ${totalCaloriesToday} ккал / ${ingredientsCaloriesRecommendation} ккал` +
     "\n" +
-    md`>*Білки:* ${totalProteinToday} г` +
-    `\n${md`
->
-    `}\n` +
+    `>*Білки:* ${totalProteinToday} г` +
+    "\n>\n" +
     categoriesMessage +
     notesMessage;
   const exerciseText =
-    md`
-> _*Фізична активність:*_
-    ` +
+    `>*_Фізична активність:_*` +
     "\n" +
     (exercise
-      ? md`>• *Тип:* ${exercise.meta?.type === "home" ? "Домашнє" : "В залі"}` +
+      ? `>• *Тип:* ${exercise.meta?.type === "home" ? "Домашнє" : "В залі"}` +
         "\n" +
-        md`>• *${
+        `>• *${
           exercise.meta?.type === "home"
             ? "Кількість кругів"
             : "Тренувальний день"
@@ -229,7 +230,7 @@ const getReportContent = async (
             : `День ${exercise.meta?.trainingDay}`
         }` +
         "\n" +
-        md`>• *${
+        `>• *${
           exercise.meta?.type === "home"
             ? "Кількість повторень"
             : "Прогрес в силових"
@@ -241,36 +242,29 @@ const getReportContent = async (
             : "Немає"
         }` +
         "\n" +
-        md`>• *Ваші почуття:* ${escapeUserData(
-          String(exercise.meta?.feeling || "")
-        )}`
-      : md`
-> Сьогодні не було проведено тренування
-        `);
+        `>• *Ваші почуття:* ${String(exercise.meta?.feeling || "")}`
+      : `>Сьогодні не було проведено тренування`);
 
   const weeklyWorkoutsText =
-    md`
-> _*Тренування за тиждень (понеділок — неділя):*_
-    ` +
+    `>*_Тренування за тиждень (понеділок — неділя):_*` +
     "\n" +
-    md`>*Проведено:* ${user.weeklyWorkoutsCount ?? 0}`;
+    `>*Проведено:* ${user.weeklyWorkoutsCount ?? 0}`;
 
   const stepsText =
-    md`
-> _*Кроки:*_
-    ` +
+    `>*_Кроки:_*` +
     "\n" +
-    md`>*Пройдено*: ${steps || 0} із ${goal}` +
+    `>*Пройдено*: ${steps || 0} із ${goal}` +
     "\n" +
-    md`>${(steps || 0) >= goal ? "Мета досягнута 🎉" : "Мета не досягнута 😔"}`;
+    `>${(steps || 0) >= goal ? "Мета досягнута 🎉" : "Мета не досягнута 😔"}`;
 
-  return (
+  const result =
     `${heading}\n\n` +
     `${nutrition}\n\n` +
     `${exerciseText}\n\n` +
     `${weeklyWorkoutsText}\n\n` +
-    `${stepsText}`
-  );
+    `${stepsText}`;
+
+  return escapeMarkdown(result);
 };
 
 export default getReportContent;
