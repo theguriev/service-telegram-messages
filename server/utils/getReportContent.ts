@@ -162,7 +162,7 @@ const getReportContent = async (
         `}\n`
       )
     : md`
-> _Немає інформації про інгредієнти_
+> Немає інформації про інгредієнти
       `;
 
   const existingNotesMessage =
@@ -170,7 +170,7 @@ const getReportContent = async (
 >
     `}\n` +
     md`
-> _Примітки користувача:_
+> _*Примітки користувача:*_
     ` +
     "\n" +
     notes.map((note) => md`>• ${escapeMarkdownV2(note.content)}`).join("\n");
@@ -199,7 +199,7 @@ const getReportContent = async (
     md`*Кількість днів до завершення підписки:* ${user.balance}`;
   const nutrition =
     md`
-\*_>__Харчування:_\*
+> _*Харчування:*_
     ` +
     "\n" +
     md`>*Калорії:* ${totalCaloriesToday} ккал / ${ingredientsCaloriesRecommendation} ккал` +
@@ -249,7 +249,7 @@ const getReportContent = async (
 
   const weeklyWorkoutsText =
     md`
-> _*Тренування за тиждень \\\\(понеділок — неділя\\\\):*_
+> _*Тренування за тиждень \\(понеділок — неділя\\):*_
     ` +
     "\n" +
     md`>*Проведено:* ${user.weeklyWorkoutsCount ?? 0}`;
