@@ -3,8 +3,8 @@ import { toZonedTime } from "date-fns-tz";
 import { InlineKeyboard } from "grammy";
 import { Types } from "mongoose";
 import { weekends } from "~~/constants";
-import resolveStartDate from "~~/utils/resolveStartDate";
-import resolveWeekDateRange from "~~/utils/resolveWeekDateRange";
+import resolveStartDate from "../../utils/resolveStartDate";
+import resolveWeekDateRange from "../../utils/resolveWeekDateRange";
 
 const requestBodySchema = z.object({
 	receiverId: z.number(),
