@@ -1,6 +1,6 @@
 import { addDays } from "date-fns";
 import { InlineKeyboard } from "grammy";
-import resolveWeekDateRange from "~~/utils/resolveWeekDateRange";
+import resolveWeekDateRange from "../../utils/resolveWeekDateRange";
 
 type ManagedQueryParams<TWord extends string> = Parameters<
 	typeof defineManagedInlineQuery<TWord, ReportUser & { balance: number }>
