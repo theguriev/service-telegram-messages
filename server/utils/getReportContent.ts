@@ -6,8 +6,10 @@ import { Ingredient, IngredientV2 } from "~~/types/aggregateModels";
 
 // Function to escape only user input data for MarkdownV2
 // (ingredients, categories, notes, feelings, user names)
+// Avoids double-escaping already escaped characters
 const escapeUserData = (text: string) => {
-  return text.replace(/[_*\[\]()~`>#+=|{}.!-]/g, "\\$&");
+  // Don't escape already escaped characters (preceded by \)
+  return text.replace(/(?<!\\)[_*\[\]()~`>#+=|{}.!-]/g, "\\$&");
 };
 
 const getReportContent = async (
@@ -258,9 +260,9 @@ const getReportContent = async (
 > _*Кроки:*_
     ` +
     "\n" +
-    md`>*Пройдено*: ${steps} із ${goal}` +
+    md`>*Пройдено*: ${steps || 0} із ${goal}` +
     "\n" +
-    md`>${steps >= goal ? "Мета досягнута 🎉" : "Мета не досягнута 😔"}`;
+    md`>${(steps || 0) >= goal ? "Мета досягнута 🎉" : "Мета не досягнута 😔"}`;
 
   return (
     `${heading}\n\n` +
