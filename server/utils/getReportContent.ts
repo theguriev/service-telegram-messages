@@ -125,22 +125,22 @@ const getReportContent = async (
           ? `${new Big(grams).mul(value).round()} шт.`
           : `${new Big(grams).mul(value).round()}г`;
 
-      return md`>• *${escapeMarkdownV2(
-        name
-      )}* \\\\(${resultValue}\\\\) \\\\(${new Big(value)
+      return md`>• *${escapeMarkdownV2(name)}* (${resultValue}) (${new Big(
+        value
+      )
         .mul(100)
-        .round()}\\\\% від рекомендованої\\\\)${
+        .round()}% від рекомендованої)${
         additionalInfo?.trim()
-          ? ` \\\\- "${escapeMarkdownV2(additionalInfo.trim())}"`
+          ? ` - "${escapeMarkdownV2(additionalInfo.trim())}"`
           : ""
       }`;
     }
 
-    return md`>• *${escapeMarkdownV2(name)}* \\\\(${grams}г\\\\): ${new Big(
-      value
-    ).mul(100)}%${
+    return md`>• *${escapeMarkdownV2(name)}* (${grams}г): ${new Big(value).mul(
+      100
+    )}%${
       additionalInfo?.trim()
-        ? ` \\\\- "${escapeMarkdownV2(additionalInfo.trim())}"`
+        ? ` - "${escapeMarkdownV2(additionalInfo.trim())}"`
         : ""
     }`;
   };
@@ -249,7 +249,7 @@ const getReportContent = async (
 
   const weeklyWorkoutsText =
     md`
-> _*Тренування за тиждень \\\\(понеділок — неділя\\\\):*_
+> _*Тренування за тиждень (понеділок — неділя):*_
     ` +
     "\n" +
     md`>*Проведено:* ${user.weeklyWorkoutsCount ?? 0}`;
