@@ -4,8 +4,9 @@ import { toZonedTime } from "date-fns-tz";
 import { groupBy, sum, sumBy } from "es-toolkit";
 import { Ingredient, IngredientV2 } from "~~/types/aggregateModels";
 
-// Function to escape user input for MarkdownV2
-const escapeMarkdownV2 = (text: string) => {
+// Function to escape only user input data for MarkdownV2
+// (ingredients, categories, notes, feelings, user names)
+const escapeUserData = (text: string) => {
   return text.replace(/[_*\[\]()~`>#+=|{}.!-]/g, "\\$&");
 };
 
@@ -125,22 +126,20 @@ const getReportContent = async (
           ? `${new Big(grams).mul(value).round()} шт.`
           : `${new Big(grams).mul(value).round()}г`;
 
-      return md`>• *${escapeMarkdownV2(name)}* (${resultValue}) (${new Big(
-        value
-      )
+      return md`>• *${escapeUserData(name)}* (${resultValue}) (${new Big(value)
         .mul(100)
         .round()}% від рекомендованої)${
         additionalInfo?.trim()
-          ? ` - "${escapeMarkdownV2(additionalInfo.trim())}"`
+          ? ` - "${escapeUserData(additionalInfo.trim())}"`
           : ""
       }`;
     }
 
-    return md`>• *${escapeMarkdownV2(name)}* (${grams}г): ${new Big(value).mul(
+    return md`>• *${escapeUserData(name)}* (${grams}г): ${new Big(value).mul(
       100
     )}%${
       additionalInfo?.trim()
-        ? ` - "${escapeMarkdownV2(additionalInfo.trim())}"`
+        ? ` - "${escapeUserData(additionalInfo.trim())}"`
         : ""
     }`;
   };
@@ -151,7 +150,7 @@ const getReportContent = async (
     )
     .map(
       ([category, sets]) =>
-        md`>*Категорія ${escapeMarkdownV2(category)}:*` +
+        md`>*Категорія ${escapeUserData(category)}:*` +
         "\n" +
         sets.map(setMessageSelector).join("\n")
     );
@@ -173,7 +172,7 @@ const getReportContent = async (
 > _*Примітки користувача:*_
     ` +
     "\n" +
-    notes.map((note) => md`>• ${escapeMarkdownV2(note.content)}`).join("\n");
+    notes.map((note) => md`>• ${escapeUserData(note.content)}`).join("\n");
   const notesMessage = notes.length ? existingNotesMessage : "";
 
   const firstName =
@@ -190,7 +189,7 @@ const getReportContent = async (
 
   const heading =
     dateHeading +
-    md`*Користувач:* [${escapeMarkdownV2(name || "Невідомий")}](tg://user?id=${
+    md`*Користувач:* [${escapeUserData(name || "Невідомий")}](tg://user?id=${
       user.id
     })` +
     "\n" +
@@ -240,7 +239,7 @@ const getReportContent = async (
             : "Немає"
         }` +
         "\n" +
-        md`>• *Ваші почуття:* ${escapeMarkdownV2(
+        md`>• *Ваші почуття:* ${escapeUserData(
           String(exercise.meta?.feeling || "")
         )}`
       : md`
