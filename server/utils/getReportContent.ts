@@ -166,7 +166,7 @@ const getReportContent = async (
 
     const heading =
         dateHeading +
-        md`*Користувач:* [${name || "Невідомий"}](tg://user?id=${user.id})` +
+        md`*Користувач:* [${name || "Невідомий"}]` + `(tg://user?id=${user.id})` +
         "\n" +
         md`*Кількість днів на програмі:* ${appUsed}` +
         "\n" +
@@ -208,7 +208,7 @@ const getReportContent = async (
             : md`>Сьогодні не було проведено тренування`);
 
     const weeklyWorkoutsText =
-        md`>*_Тренування за тиждень \\(понеділок — неділя\\):_*` +
+        md`>*_Тренування за тиждень \(понеділок — неділя\):_*` +
         "\n" +
         md`>*Проведено:* ${user.weeklyWorkoutsCount ?? 0}`;
 
