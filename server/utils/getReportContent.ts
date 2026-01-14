@@ -123,12 +123,14 @@ const getReportContent = async (
                     ? `${new Big(grams).mul(value).round()} шт.`
                     : `${new Big(grams).mul(value).round()}г`;
 
-            return md`>• *${name}* \\(${resultValue}\\) \\(${new Big(value).mul(100).round()}\\% від рекомендованої\\)${additionalInfo?.trim() ? ` - "${additionalInfo.trim()}"` : ""
-                }`;
+            const trimmedAdditionalInfo = additionalInfo?.trim();
+            const additionalText = trimmedAdditionalInfo ? ` - "${trimmedAdditionalInfo}"` : "";
+            return md`>• *${name}* \\(${resultValue}\\) \\(${new Big(value).mul(100).round()}\\% від рекомендованої\\)${additionalText}`;
         }
 
-        return md`>• *${name}* \\(${grams}г\\): ${new Big(value).mul(100)}%${additionalInfo?.trim() ? ` - "${additionalInfo.trim()}"` : ""
-            }`;
+        const trimmedAdditionalInfo = additionalInfo?.trim();
+        const additionalText = trimmedAdditionalInfo ? ` - "${trimmedAdditionalInfo}"` : "";
+        return md`>• *${name}* \\(${grams}г\\): ${new Big(value).mul(100)}%${additionalText}`;
     };
 
     const categoryMessages = Object.entries(groupedSets)

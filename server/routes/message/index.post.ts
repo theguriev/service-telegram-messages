@@ -427,7 +427,7 @@ export default eventHandler(async (event) => {
 								(message) =>
 									md`*Повідомлення за ${message.createdAt.toLocaleDateString("uk-UA")}:*` +
 									"\n" +
-									message.content,
+									md`${message.content}`,
 							)
 							.join(separator) +
 						separator +
