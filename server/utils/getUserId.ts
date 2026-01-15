@@ -1,7 +1,5 @@
 import type { EventHandlerRequest, H3Event } from "h3";
 import { createError, getCookie } from "h3";
-
-import type { AccessTokenPayload } from "~/types/accessToken";
 import verify from "./verify";
 
 export const getAccessTokenPayload = async (
