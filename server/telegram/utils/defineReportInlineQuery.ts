@@ -1,6 +1,5 @@
 import { addDays } from "date-fns";
 import { InlineKeyboard } from "grammy";
-import resolveWeekDateRange from "../../utils/resolveWeekDateRange";
 
 type ManagedQueryParams<TWord extends string> = Parameters<
 	typeof defineManagedInlineQuery<TWord, ReportUser & { balance: number }>
@@ -32,7 +31,7 @@ const defineReportInlineQuery = <TWord extends string>(
 					date: params.date(),
 					showDate: true,
 					maxConsumption: Number(maxIngredientConsumption || 100),
-				}),
+				}).full,
 			reply_markup: (user, { ctx, config: { telegramApp } }) =>
 				new InlineKeyboard().url(
 					"Перейти до користувача",
@@ -49,7 +48,7 @@ const defineReportInlineQuery = <TWord extends string>(
 					date: params.date(),
 					showDate: true,
 					maxConsumption: Number(maxIngredientConsumption || 100),
-				}),
+				}).full,
 			reply_markup: (user, { ctx, config: { telegramApp } }) =>
 				new InlineKeyboard().url(
 					"Перейти до користувача",
@@ -62,8 +61,9 @@ const defineReportInlineQuery = <TWord extends string>(
 		customPipeline: () => {
 			const startDate = resolveStartDate(params.date());
 			const endDate = addDays(startDate, 1);
-			const { start: weekStartDate, end: weekEndDate } =
-				resolveWeekDateRange(params.date());
+			const { start: weekStartDate, end: weekEndDate } = resolveWeekDateRange(
+				params.date(),
+			);
 
 			return [
 				{

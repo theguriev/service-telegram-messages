@@ -4,7 +4,7 @@ import { toZonedTime } from "date-fns-tz";
 import { groupBy, sum, sumBy } from "es-toolkit";
 import { Ingredient, IngredientV2 } from "~~/types/aggregateModels";
 
-const getReportContent = async (
+const getReportContent = (
 	user: ReportUser & { balance: number },
 	options: {
 		date: Date;
@@ -187,9 +187,7 @@ const getReportContent = async (
 			? md`>• *Тип:* ${exercise.meta?.type === "home" ? "Домашнє" : "В залі"}` +
 				"\n" +
 				md`>• *${
-					exercise.meta?.type === "home"
-						? "Кількість кругів"
-						: "Тренувальний день"
+					exercise.meta?.type === "home" ? "Кількість кіл" : "Тренувальний день"
 				}:* ${
 					exercise.meta?.type === "home"
 						? exercise.meta?.rounds
@@ -208,8 +206,8 @@ const getReportContent = async (
 							: "Немає"
 				}` +
 				"\n" +
-				md`>• *Ваші почуття:* ${exercise.meta?.feeling}`
-			: md`>Сьогодні не було проведено тренування`);
+				md`>• *Ваші відчуття:* ${exercise.meta?.feeling}`
+			: md`>Сьогодні не було тренування`);
 
 	const weeklyWorkoutsText =
 		md`>*_Тренування за тиждень \(понеділок — неділя\):_*` +
@@ -223,13 +221,14 @@ const getReportContent = async (
 		"\n" +
 		md`>${steps >= goal ? "Мета досягнута 🎉" : "Мета не досягнута 😔"}`;
 
-	return (
-		`${heading}\n\n` +
-		`${nutrition}\n\n` +
-		`${exerciseText}\n\n` +
-		`${weeklyWorkoutsText}\n\n` +
-		`${stepsText}`
-	);
+	const nutritionPart = `${heading}\n\n${nutrition}`;
+	const activityPart = `${exerciseText}\n\n${weeklyWorkoutsText}\n\n${stepsText}`;
+
+	return {
+		nutrition: nutritionPart,
+		activity: activityPart,
+		full: `${nutritionPart}\n\n${activityPart}`,
+	};
 };
 
 export default getReportContent;
