@@ -34,12 +34,17 @@ const getReportContent = (
 
 	const programStartDate = user.meta?.programStart
 		? new Date(user.meta.programStart)
-		: message
-			? resolveStartDate(message.createdAt, "Etc/UTC", true)
-			: undefined;
-	const appUsed = programStartDate
-		? differenceInDays(utcStartDate, programStartDate) + 1
+		: undefined;
+	const firstMessageDate = message
+		? resolveStartDate(message.createdAt, "Etc/UTC", true)
+		: undefined;
+	const programDay = programStartDate
+		? differenceInDays(utcStartDate, programStartDate)
+		: undefined;
+	const firstMessageDay = firstMessageDate
+		? differenceInDays(utcStartDate, firstMessageDate) + 1
 		: 1;
+	const appUsed = programDay ?? firstMessageDay;
 
 	const createIngredientValueSelector =
 		(key: KeyByType<Ingredient | IngredientV2, number>) =>
