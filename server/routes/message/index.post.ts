@@ -402,7 +402,7 @@ export default eventHandler(async (event) => {
 			const isWeekend = weekends.includes(
 				toZonedTime(new Date(), timezone ?? "Europe/Kyiv").getDay(),
 			);
-			const report = await getReportContent(
+			const report = getReportContent(
 				{
 					...user,
 					balance,
