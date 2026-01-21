@@ -1,59 +1,66 @@
-export const splitMessage = (
-	content: string,
-	limit: number = 4096,
+const _splitRecursive = (
+    content: string,
+    limit: number,
+    separator: string,
+    fallbackSeparators: string[],
 ): string[] => {
-	if (content.length <= limit) {
-		return [content];
-	}
+    if (content.length <= limit) {
+        return [content];
+    }
 
-	const chunks: string[] = [];
-	let currentChunk = "";
+    const chunks: string[] = [];
+    let currentChunk = "";
 
-	const blocks = content.split("\n\n");
+    const parts = content.split(separator);
 
-	for (const block of blocks) {
-		if ((currentChunk + (currentChunk ? "\n\n" : "") + block).length > limit) {
-			if (currentChunk) {
-				chunks.push(currentChunk);
-				currentChunk = "";
-			}
+    for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        const nextChunk =
+            currentChunk + (currentChunk ? separator : "") + part;
 
-			if (block.length > limit) {
-				const lines = block.split("\n");
-				for (const line of lines) {
-					if (
-						(currentChunk + (currentChunk ? "\n" : "") + line).length > limit
-					) {
-						if (currentChunk) {
-							chunks.push(currentChunk);
-							currentChunk = "";
-						}
+        if (nextChunk.length > limit) {
+            if (currentChunk) {
+                chunks.push(currentChunk);
+                currentChunk = "";
+            }
 
-						if (line.length > limit) {
-							let remainingLine = line;
-							while (remainingLine.length > limit) {
-								chunks.push(remainingLine.slice(0, limit));
-								remainingLine = remainingLine.slice(limit);
-							}
-							currentChunk = remainingLine;
-						} else {
-							currentChunk = line;
-						}
-					} else {
-						currentChunk += (currentChunk ? "\n" : "") + line;
-					}
-				}
-			} else {
-				currentChunk = block;
-			}
-		} else {
-			currentChunk += (currentChunk ? "\n\n" : "") + block;
-		}
-	}
+            if (part.length > limit) {
+                if (fallbackSeparators.length > 0) {
+                    const [nextSeparator, ...restSeparators] = fallbackSeparators;
+                    chunks.push(
+                        ..._splitRecursive(
+                            part,
+                            limit,
+                            nextSeparator,
+                            restSeparators,
+                        ),
+                    );
+                } else {
+                    let remainingPart = part;
+                    while (remainingPart.length > limit) {
+                        chunks.push(remainingPart.slice(0, limit));
+                        remainingPart = remainingPart.slice(limit);
+                    }
+                    currentChunk = remainingPart;
+                }
+            } else {
+                currentChunk = part;
+            }
+        } else {
+            currentChunk = nextChunk;
+        }
+    }
 
-	if (currentChunk) {
-		chunks.push(currentChunk);
-	}
+    if (currentChunk) {
+        chunks.push(currentChunk);
+    }
 
-	return chunks;
+    return chunks;
+};
+
+export const splitMessage = (
+    content: string,
+    limit: number = 4096,
+): string[] => {
+    return _splitRecursive(content, limit, "\n\n", ["\n"]);
 };
