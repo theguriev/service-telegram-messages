@@ -34,12 +34,7 @@ export default eventHandler(async (event) => {
 			didntSend: true,
 		}).sort({ createdAt: 1 });
 
-		try {
-			const telegram = useTelegramBot();
-			const isWeekend = weekends.includes(
-				toZonedTime(new Date(), timezone ?? "Europe/Kyiv").getDay(),
-			);
-			const report = getReportContent(
+        const report = getReportContent(
 				{
 					...user,
 					balance,
@@ -50,6 +45,13 @@ export default eventHandler(async (event) => {
 					maxConsumption: Number(maxIngredientConsumption || 100),
 				},
 			);
+
+		try {
+			const telegram = useTelegramBot();
+			const isWeekend = weekends.includes(
+				toZonedTime(new Date(), timezone ?? "Europe/Kyiv").getDay(),
+			);
+			
 
 			if (!isWeekend) {
 				const separator =
@@ -195,12 +197,27 @@ export default eventHandler(async (event) => {
 				content: report.full,
 				receiverId,
 			});
-			return { message };
+			return {
+				message,
+				debug: {
+					full_report: report.full || "",
+					report_length: report.full?.length || 0,
+					isWeekend: isWeekend || false,
+					previousMessagesCount: previousMessages.length || 0,
+				},
+			};
 		} catch (error) {
 			throw createError({
 				statusCode: 500,
 				statusMessage: "Internal Server Error",
 				message: `Failed to send message: ${error.message}`,
+				data: {
+					debug_full_report: report.full || "",
+					debug_report_length: report.full?.length || 0,
+					debug_error: error.message || "",
+					userId: user?._id || "",
+					receiverId: receiverId || 0,
+				},
 			});
 		}
 	}
